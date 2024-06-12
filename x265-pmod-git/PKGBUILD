@@ -1,0 +1,84 @@
+#!/hint/bash
+
+pkgname=x265-pmod-git
+pkgver=3.6+13+1.r0.g726aec12
+pkgrel=2
+pkgdesc='Open source H.265/HEVC video encoder (git version)'
+arch=('x86_64')
+url='https://bitbucket.org/multicoreware/x265_git'
+license=('GPL')
+depends=('gcc-libs' 'numactl')
+makedepends=('git' 'cmake' 'nasm' 'avisynthplus' 'vapoursynth')
+provides=('x265' 'libx265.so')
+# source=('git+https://github.com/rokibhasansagar/x265_mirror.git#branch=pMod-master')
+source=('x265_mirror::git+https://github.com/Patman86/x265-Mod-by-Patman.git#branch=master')
+sha256sums=('SKIP')
+
+pkgver() {
+    git -C x265_mirror describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
+}
+
+prepare() {
+    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 209)' x265_mirror/source/CMakeLists.txt
+    case "${TARGETPLATFORM}" in
+        "linux/amd64") export targetmarch="x86-64" ;;
+        "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
+        "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
+        *) export targetmarch="native" ;;
+    esac
+}
+
+build() {
+    export SuppressorFlags='-Wno-dev -Wno-unused-parameter -Wno-unused-variable -Wno-implicit-function-declaration -Wno-unused-result'
+    export CFLAGS_TUNING="-march=${targetmarch:-native} -O3"
+    cmake -S x265_mirror/source -B build-12 \
+        -G 'Unix Makefiles' \
+        -DCMAKE_INSTALL_PREFIX='/usr' \
+        -DENABLE_SHARED='OFF' \
+        -DHIGH_BIT_DEPTH='ON' \
+        -DMAIN12='ON' \
+        -DEXPORT_C_API='OFF' \
+        -DENABLE_CLI='OFF' \
+        -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
+        -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
+        -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
+        ${SuppressorFlags}
+    cmake --build build-12
+
+    cmake -S x265_mirror/source -B build-10 \
+        -G 'Unix Makefiles' \
+        -DCMAKE_INSTALL_PREFIX='/usr' \
+        -DENABLE_SHARED='OFF' \
+        -DHIGH_BIT_DEPTH='ON' \
+        -DEXPORT_C_API='OFF' \
+        -DENABLE_CLI='OFF' \
+        -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
+        -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
+        -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
+        ${SuppressorFlags}
+    cmake --build build-10
+
+    cmake -S x265_mirror/source -B build \
+        -G 'Unix Makefiles' \
+        -DCMAKE_INSTALL_PREFIX:PATH='/usr' \
+        -DENABLE_SHARED='ON' \
+        -DENABLE_HDR10_PLUS='ON' \
+        -DEXTRA_LIB='x265_main10.a;x265_main12.a' \
+        -DEXTRA_LINK_FLAGS='-L.' \
+        -DENABLE_CLI='ON' \
+        -DLINKED_10BIT='ON' \
+        -DLINKED_12BIT='ON' \
+        -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
+        -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
+        -DENABLE_VAPOURSYNTH='ON' \
+        -DENABLE_AVISYNTH='ON' \
+        -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
+        ${SuppressorFlags}
+    ln -s ../build-10/libx265.a build/libx265_main10.a
+    ln -s ../build-12/libx265.a build/libx265_main12.a
+    cmake --build build
+}
+
+package() {
+    DESTDIR="$pkgdir" cmake --install build
+}

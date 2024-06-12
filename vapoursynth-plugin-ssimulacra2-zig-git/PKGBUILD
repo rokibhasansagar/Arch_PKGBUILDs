@@ -1,0 +1,32 @@
+#!/hint/bash
+
+_pkgname=vapoursynth-plugin-ssimulacra2-zig
+pkgname=${_pkgname}-git
+pkgver=r3.r6.gebe175a
+pkgrel=2
+pkgdesc='A Vapoursynth plugin implementing SSIMULACRA2 written in Zig'
+arch=('x86_64')
+url="https://github.com/dnjulek/vapoursynth-ssimulacra2"
+license=('MIT')
+provides=('vapoursynth-plugin-ssimulacra2-zig')
+conflicts=('vapoursynth-plugin-ssimulacra2-zig')
+depends=('glibc')
+makedepends=('git' 'zig')
+source=("${_pkgname}::git+https://github.com/dnjulek/vapoursynth-ssimulacra2.git")
+b2sums=('SKIP')
+
+pkgver() {
+    git -C ${_pkgname} describe --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
+}
+
+build() {
+    cd ${_pkgname}
+    zig build -Doptimize=ReleaseFast
+}
+
+package() {
+    cd "${srcdir}"
+    install -Dm 644 ${_pkgname}/zig-out/lib/libssimulacra2.so -t "${pkgdir}"/usr/lib/vapoursynth/
+    install -Dm 644 ${_pkgname}/LICENSE -t "${pkgdir}"/usr/share/licenses/${pkgname}/
+}
+

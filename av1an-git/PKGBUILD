@@ -1,0 +1,54 @@
+#!/hint/bash
+
+pkgname=av1an-git
+pkgver=r2328.e9d953d
+pkgrel=2
+pkgdesc='A cross-platform all-in-one tool for streamlining AV1 encoding'
+arch=('x86_64')
+url='https://github.com/master-of-zen/Av1an'
+license=('GPL3')
+makedepends=('git' 'cargo' 'nasm' 'clang')
+depends=('ffmpeg' 'aom' 'vapoursynth')
+optdepends=(
+    'svt-av1: SVT-AV1 encoder support'
+    'rav1e: rav1e encoder support'
+    'libvpx: vpx encoder support'
+    'vmaf: VMAF calculation support'
+    'mkvtoolnix-cli: mkvmerge support'
+    'ffms2'
+    'vapoursynth-plugin-lsmashsource'
+)
+provides=('av1an')
+source=("git+https://github.com/master-of-zen/Av1an.git")
+sha256sums=('SKIP')
+
+pkgver() {
+    cd "Av1an"
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
+}
+
+prepare() {
+    cd "Av1an"
+    case "${TARGETPLATFORM}" in
+        "linux/amd64") export targetmarch="x86-64" ;;
+        "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
+        "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
+        *) export targetmarch="native" ;;
+    esac
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo fetch --target "${arch}-unknown-linux-gnu"
+}
+
+build() {
+    cd "Av1an"
+    export CFLAGS+=" -ffat-lto-objects"
+    RUSTUP_TOOLCHAIN=stable RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" \
+        cargo build --target "${arch}-unknown-linux-gnu" --release
+
+    strip "target/${arch}-unknown-linux-gnu/release/av1an"
+}
+
+package() {
+    cd "Av1an"
+    install -Dm 755 target/${arch}-unknown-linux-gnu/release/av1an -t "${pkgdir}/usr/bin"
+}
+

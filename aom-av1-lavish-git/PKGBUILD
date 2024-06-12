@@ -1,0 +1,53 @@
+#!/hint/bash
+
+pkgname=aom-av1-lavish-git  # DEPRECATED: Use aom-psy101-git
+pkgver=r33047.3b4594d81
+pkgrel=2
+pkgdesc="aomenc-av1 lavish fork"
+url="https://aomedia.googlesource.com/aom/"
+arch=('x86_64')
+provides=('aom' 'aom-git' 'libaom.so')
+license=('BSD-3-Clause' 'custom:PATENTS')
+depends=('gcc-libs' 'glibc' 'vmaf' 'libjxl-metrics-git')
+makedepends=('cmake' 'ninja' 'nasm' 'git')
+source=('git+https://github.com/Clybius/aom-av1-lavish.git#branch=opmox/mainline-merge')
+sha256sums=('SKIP')
+
+pkgver() {
+    printf "r%s.%s" "$(git -C ${pkgname%-git} rev-list --count HEAD)" "$(git -C ${pkgname%-git} rev-parse --short HEAD)"
+}
+
+prepare() {
+    sed -i 's/-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0/-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2/g' ${pkgname%-git}/build/cmake/aom_configure.cmake
+    case "${TARGETPLATFORM}" in
+        "linux/amd64") export targetmarch="x86-64" ;;
+        "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
+        "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
+        *) export targetmarch="native" ;;
+    esac
+}
+
+build() {
+    export SuppressorFlags='-Wno-dev -Wno-unused-parameter -Wno-unused-variable -Wno-implicit-function-declaration -Wno-unused-result'
+    cmake -S ${pkgname%-git} -B build -G Ninja \
+        -DCMAKE_BUILD_TYPE='Release' \
+        -DCMAKE_INSTALL_PREFIX='/usr' \
+        -DCMAKE_INSTALL_LIBDIR='lib' \
+        -DBUILD_SHARED_LIBS=1 \
+        -DCONFIG_TUNE_VMAF=1 \
+        -DCONFIG_TUNE_BUTTERAUGLI=0 \
+        -DCONFIG_AV1_ENCODER=1 \
+        -DCONFIG_AV1_DECODER=1 \
+        -DENABLE_TESTS=0 -DENABLE_DOCS=0 \
+        -DENABLE_NASM='ON' \
+        -DCMAKE_CXX_FLAGS="-flto -O3 -march=${targetmarch:-native}" \
+        -DCMAKE_C_FLAGS="-flto -O3 -march=${targetmarch:-native} -pipe -fno-plt" \
+        -DCMAKE_EXE_LINKER_FLAGS="-flto -O3 -march=${targetmarch:-native}" \
+        ${SuppressorFlags}
+    cmake --build build
+}
+
+package() {
+    DESTDIR="$pkgdir" cmake --install build
+    install -Dt "$pkgdir/usr/share/licenses/$pkgname" -m644 ${pkgname%-git}/{LICENSE,PATENTS}
+}

@@ -1,0 +1,61 @@
+#!/hint/bash
+
+_plug=bmdegrain
+pkgname=vapoursynth-plugin-${_plug}-git
+pkgver=9.92d902f
+pkgrel=2
+pkgdesc="Plugin for Vapoursynth: ${_plug} (GIT Version)"
+arch=('x86_64')
+url='https://github.com/AmusementClub/vs-bmdegrain'
+license=('GPL3')
+depends=('vapoursynth')
+makedepends=(
+    'git'
+    'gcc'
+    'ninja'
+    'cmake'
+)
+provides=("vapoursynth-plugin-${_plug}")
+conflicts=("vapoursynth-plugin-${_plug}")
+source=(
+    "${_plug}::git+https://github.com/AmusementClub/vs-bmdegrain.git"
+    "vectorclass.zip::https://github.com/vectorclass/version2/archive/refs/tags/v2.02.01.zip"
+)
+sha256sums=(
+    'SKIP'
+    'SKIP'
+)
+# options=('debug')
+
+pkgver() {
+    cd "${_plug}"
+
+    _rev=$(git rev-list --count --all)
+    _hash=$(git rev-parse --short HEAD)
+    printf "%s.%s" "$_rev" "$_hash"
+}
+
+prepare() {
+    cd "${_plug}"
+
+    rm -rf version2-2.02.01 vectorclass
+    unzip ../vectorclass.zip
+    mv version2-2.02.01 vectorclass
+
+    CXX=g++ cmake -S . -B build -G Ninja -LA \
+        -D CMAKE_BUILD_TYPE=Release \
+        -D CMAKE_CXX_FLAGS="-Wall -mavx2 -mfma -ffast-math" \
+        -D VCL_HOME="$(pwd)/vectorclass" \
+        -D VS_INCLUDE_DIR="/usr/include/vapoursynth"
+}
+
+build() {
+    cd "${_plug}"
+
+    cmake --build build
+}
+
+package() {
+    install -Dm755 "${_plug}/build/libbmdegrain.so" "${pkgdir}/usr/lib/vapoursynth/libbmdegrain.so"
+    install -Dm644 "${_plug}/README.md" "${pkgdir}/usr/share/doc/vapoursynth/plugins/${_plug}/README.md"
+}

@@ -1,0 +1,53 @@
+#!/hint/bash
+
+_pkgname=libdovi
+pkgname=${_pkgname}-git
+pkgver=3.3.0.r8.g8fc10c8
+pkgrel=2
+pkgdesc='Library to read and write Dolby Vision metadata (C-API) - git version'
+arch=('x86_64')
+url='https://github.com/quietvoid/dovi_tool/tree/main/dolby_vision'
+license=('MIT')
+depends=('gcc-libs' 'glibc')
+makedepends=('git' 'cargo' 'cargo-c')
+# conflicts=('libdovi')
+provides=('libdovi' 'libdovi.so')
+source=("git+https://github.com/quietvoid/dovi_tool.git")
+sha256sums=('SKIP')
+
+pkgver() {
+    git -C dovi_tool describe --match "libdovi-[0-9]*" --long HEAD --tags | sed 's/^libdovi-//;s/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+    case "${TARGETPLATFORM}" in
+        "linux/amd64") export targetmarch="x86-64" ;;
+        "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
+        "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
+        *) export targetmarch="native" ;;
+    esac
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo fetch \
+        --manifest-path dovi_tool/dolby_vision/Cargo.toml
+}
+
+build() {
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo cbuild \
+        --release --frozen --prefix=/usr \
+        --manifest-path dovi_tool/dolby_vision/Cargo.toml
+}
+
+check() {
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo test \
+        --release --frozen --all-features \
+        --manifest-path dovi_tool/dolby_vision/Cargo.toml
+}
+
+package() {
+    cd dovi_tool/dolby_vision
+
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo cinstall \
+        --release --frozen --prefix /usr \
+        --destdir "${pkgdir}"
+
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${_pkgname}/LICENSE"
+}

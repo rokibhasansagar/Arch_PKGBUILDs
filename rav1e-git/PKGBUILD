@@ -1,0 +1,61 @@
+#!/hint/bash
+
+pkgname=rav1e-git   # FIXME: Currently Broken, Issue: libgit2
+pkgver=0.7.1.r35.gc7c72b55
+pkgrel=2
+pkgdesc="The fastest and safest AV1 encoder"
+arch=('x86_64')
+url="https://github.com/xiph/rav1e"
+license=('BSD' 'custom')
+depends=('gcc-libs')
+makedepends=('git' 'rust' 'nasm' 'cargo-c' 'libgit2')
+provides=("rav1e=$pkgver" 'librav1e.so')
+options=('staticlibs')
+source=("git+https://github.com/xiph/rav1e.git")   # #commit=f8d82b7
+sha256sums=('SKIP')
+
+prepare() {
+    cd "rav1e"
+
+    # curl -sL "https://github.com/xiph/rav1e/releases/download/v0.7.1/Cargo.lock" -O
+    curl -sL "https://patch-diff.githubusercontent.com/raw/xiph/rav1e/pull/3349.patch" -O
+    patch -p1 -i 3349.patch || true
+    sed -i -z 's|name = "rav1e"\nversion = "0.7.0"|name = "rav1e"\nversion = "0.7.1"|g' Cargo.toml Cargo.lock
+    sed -i -z 's|name = "git2"\nversion = "0.18.1"|name = "git2"\nversion = "0.18.3"|g' Cargo.lock
+    sed -i 's|fbf97ba92db08df386e10c8ede66a2a0369bd277090afd8710e19e38de9ec0cd|232e6a7bfe35766bf715e55a88b39a700596c0ccfd88cd3680b4cdb40d66ef70|g' Cargo.lock
+    case "${TARGETPLATFORM}" in
+        "linux/amd64") export targetmarch="x86-64" ;;
+        "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
+        "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
+        *) export targetmarch="native" ;;
+    esac
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" \
+        cargo fetch --target "${arch}-unknown-linux-gnu"
+}
+
+pkgver() {
+    cd "rav1e"
+
+    _tag=$(git tag -l --sort -v:refname | head -n1)
+    _rev=$(git rev-list --count $_tag..HEAD)
+    _hash=$(git rev-parse --short HEAD)
+    printf "%s.r%s.g%s" "$_tag" "$_rev" "$_hash" | sed 's/^v//;s/-/./g'
+}
+
+package() {
+    cd "rav1e"
+
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" LDFLAGS+=" -lgit2" \
+        cargo build --target "${arch}-unknown-linux-gnu" --release
+
+    strip "target/${arch}-unknown-linux-gnu/release/rav1e"
+    install -Dm755 "target/${arch}-unknown-linux-gnu/release/rav1e" -t "$pkgdir/usr/bin"
+
+    # for librav1e
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" LDFLAGS+=" -lgit2" \
+        cargo cinstall --target "${arch}-unknown-linux-gnu" --release --all-targets \
+        --destdir "$pkgdir" --prefix "/usr"
+
+    install -Dm644 "README.md" -t "$pkgdir/usr/share/doc/rav1e"
+    install -Dm644 {LICENSE,PATENTS} -t "$pkgdir/usr/share/licenses/rav1e"
+}

@@ -1,0 +1,60 @@
+#!/hint/bash
+
+pkgname=svt-av1-psy-git
+pkgver=2.1.0.A.r1.g37a5609b
+pkgrel=4
+pkgdesc='Scalable Video Technology AV1 encoder and decoder (git version)'
+arch=('x86_64')
+url='https://gitlab.com/AOMediaCodec/SVT-AV1/'
+license=('BSD' 'custom: Alliance for Open Media Patent License 1.0')
+depends=('glibc')
+makedepends=('git' 'cmake' 'nasm' 'clang' 'libdovi-git' 'libhdr10plus-rs-git')
+# options=('!strip')
+provides=('svt-av1')
+conflicts=('svt-av1')
+source=('git+https://github.com/gianni-rosato/svt-av1-psy.git#branch=master')
+sha256sums=('SKIP')
+
+prepare() {
+    cd ${pkgname%-git}
+    case "${TARGETPLATFORM}" in
+        "linux/amd64") export targetmarch="x86-64" ;;
+        "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
+        "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
+        *) export targetmarch="native" ;;
+    esac
+}
+
+pkgver() {
+    git -C ${pkgname%-git} describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
+}
+
+build() {
+    export SuppressorFlags='-Wno-dev -Wno-unused-parameter -Wno-unused-variable -Wno-implicit-function-declaration -Wno-unused-result'
+    export CFLAGS_PGO_USE="-march=${targetmarch:-native} -O3 -fprofile-instr-use='/tmp/svt-pgo/pgo.profdata'"
+    export CC='/usr/bin/clang'
+    export CXX='/usr/bin/clang++'
+    export LDFLAGS+=' -Wl,-z,noexecstack'
+    cmake -B build -S ${pkgname%-git} \
+        -DCMAKE_INSTALL_PREFIX='/usr' \
+        -DCMAKE_BUILD_TYPE='Release' \
+        -DBUILD_SHARED_LIBS='ON' \
+        -DSVT_AV1_LTO='ON' \
+        -DSVT_AV1_PGO_DIR='/tmp/svt-pgo' \
+        -DENABLE_AVX512='ON' -DNATIVE='ON' \
+        -DBUILD_TESTING='OFF' \
+        -DBUILD_DEC='OFF' \
+        -DCMAKE_C_FLAGS="$CFLAGS_PGO_USE -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS="$CFLAGS_PGO_USE -DNDEBUG" \
+        -DCMAKE_EXE_LINKER_FLAGS="$CFLAGS_PGO_USE" \
+        -DCMAKE_ASM_NASM_COMPILER="nasm" \
+        -DLIBDOVI_FOUND=1 \
+        -DLIBHDR10PLUS_RS_FOUND=1 \
+        ${SuppressorFlags}
+    make -C build
+}
+
+package() {
+    make -C build DESTDIR="$pkgdir" install
+    install -D -m644 ${pkgname%-git}/{LICENSE,PATENTS}.md -t "${pkgdir}/usr/share/licenses/${pkgname}"
+}

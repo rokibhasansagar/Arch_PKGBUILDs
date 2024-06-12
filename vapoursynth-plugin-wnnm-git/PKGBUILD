@@ -1,0 +1,65 @@
+#!/hint/bash
+
+_plug=wnnm
+pkgname=vapoursynth-plugin-${_plug}-git
+pkgver=45.a8977b4
+pkgrel=2
+pkgdesc="Plugin for Vapoursynth: ${_plug} (GIT Version)"
+arch=('x86_64')
+url='https://github.com/WolframRhodium/VapourSynth-WNNM'
+license=('GPL3')
+depends=('vapoursynth')
+makedepends=(
+    'git'
+    'gcc'
+    'ninja'
+    'cmake'
+    'intel-oneapi-mkl'  # FIXES: pip install mkl-static
+)
+provides=("vapoursynth-plugin-${_plug}")
+conflicts=("vapoursynth-plugin-${_plug}")
+source=(
+    "${_plug}::git+https://github.com/WolframRhodium/VapourSynth-WNNM.git"
+    "vectorclass.zip::https://github.com/vectorclass/version2/archive/refs/tags/v2.02.01.zip"
+)
+sha256sums=(
+    'SKIP'
+    'SKIP'
+)
+# options=('debug')
+
+pkgver() {
+    cd "${_plug}"
+
+    _rev=$(git rev-list --count --all)
+    _hash=$(git rev-parse --short HEAD)
+    printf "%s.%s" "$_rev" "$_hash"
+}
+
+prepare() {
+    cd "${_plug}"
+
+    rm -rf version2-2.02.01 vectorclass
+    unzip ../vectorclass.zip
+    mv version2-2.02.01 vectorclass
+
+    CXX=g++ cmake -S . -B build -G Ninja -LA \
+        -D CMAKE_BUILD_TYPE=Release \
+        -D CMAKE_CXX_FLAGS="-Wall -mavx2 -mfma -ffast-math" \
+        -D MKL_ROOT="/opt/intel/oneapi/mkl/latest" \
+        -D MKL_ARCH="intel64" -D MKL_LINK=static \
+        -D MKL_THREADING=sequential -D MKL_INTERFACE=lp64 \
+        -D VCL_HOME="$(pwd)/vectorclass" \
+        -D VS_INCLUDE_DIR="/usr/include/vapoursynth"
+}
+
+build() {
+    cd "${_plug}"
+
+    cmake --build build
+}
+
+package() {
+    install -Dm755 "${_plug}/build/libwnnm.so" "${pkgdir}/usr/lib/vapoursynth/libwnnm.so"
+    install -Dm644 "${_plug}/README.md" "${pkgdir}/usr/share/doc/vapoursynth/plugins/${_plug}/README.md"
+}

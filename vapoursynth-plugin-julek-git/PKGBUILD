@@ -1,0 +1,50 @@
+#!/hint/bash
+
+_pkgname=vapoursynth-plugin-julek
+pkgname=${_pkgname}-git
+pkgver=r3.r3.g7674578
+pkgrel=2
+pkgdesc='A collection of some optimized and new vapoursynth filters for more performance.'
+arch=('x86_64')
+url="https://github.com/dnjulek/vapoursynth-julek-plugin"
+license=('MIT')
+depends=('glibc')
+makedepends=('git' 'cmake' 'brotli' 'gdk-pixbuf2' 'giflib' 'gimp'
+             'gperftools' 'highway' 'libjpeg-turbo' 'libpng' 'openexr'
+             'gtest' 'java-environment' 'python' 'asciidoc' 'doxygen'
+             'graphviz' 'xdg-utils' 'clang' 'nasm' 'ninja' 'vapoursynth')
+source=("${_pkgname}::git+https://github.com/dnjulek/vapoursynth-julek-plugin.git"
+        "git+https://github.com/libjxl/libjxl.git")
+
+b2sums=('SKIP'
+        'SKIP')
+
+prepare() {
+    sed '/CMAKE_BUILD_TYPE Release/d' -i ${_pkgname}/CMakeLists.txt
+    git -C ${_pkgname} submodule init
+    git -C ${_pkgname} config --local submodule.thirdparty/libjxl.url "$srcdir/libjxl"
+    git -C ${_pkgname} -c protocol.file.allow=always submodule update
+}
+
+pkgver() {
+    git -C ${_pkgname} describe --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
+}
+
+build() {
+    cd "${srcdir}"/${_pkgname}/thirdparty/libjxl/ && ./deps.sh
+    cd "${srcdir}"/${_pkgname}/thirdparty && mkdir libjxl_build && cd libjxl_build
+    cmake -C ../libjxl_cache.cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -G Ninja ../libjxl
+    cmake --build .
+    cmake --install .
+    cd ../..
+    cmake -B build -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -G Ninja
+    cmake --build build
+}
+
+package() {
+    cd "${srcdir}"/${_pkgname}
+    DESTDIR="${pkgdir}" cmake --install build
+    cd "${srcdir}"
+    install -Dm 644 ${_pkgname}/LICENSE -t "${pkgdir}"/usr/share/licenses/${pkgname}/
+}
+

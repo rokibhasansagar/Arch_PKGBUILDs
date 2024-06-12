@@ -1,0 +1,47 @@
+#!/hint/bash
+
+_pkgname=libhdr10plus-rs
+pkgname=${_pkgname}-git
+pkgver=2.1.2.r5.ga26b085
+pkgrel=2
+pkgdesc='Library to read and write HDR10+ metadata (C-API) - git version'
+arch=('x86_64')
+url='https://github.com/quietvoid/hdr10plus_tool/tree/main/hdr10plus'
+license=('MIT')
+depends=('gcc-libs' 'glibc')
+makedepends=('git' 'cargo' 'cargo-c')
+# conflicts=('libhdr10plus-rs')
+provides=('libhdr10plus-rs' 'libhdr10plus-rs.so')
+source=("git+https://github.com/quietvoid/hdr10plus_tool.git")
+sha256sums=('SKIP')
+
+pkgver() {
+    git -C hdr10plus_tool describe --match "libhdr10plus-[0-9]*" --long HEAD --tags | sed 's/^libhdr10plus-//;s/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+prepare() {
+    case "${TARGETPLATFORM}" in
+        "linux/amd64") export targetmarch="x86-64" ;;
+        "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
+        "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
+        *) export targetmarch="native" ;;
+    esac
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo fetch \
+        --manifest-path hdr10plus_tool/hdr10plus/Cargo.toml
+}
+
+build() {
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo cbuild \
+        --release --frozen --prefix=/usr \
+        --manifest-path hdr10plus_tool/hdr10plus/Cargo.toml
+}
+
+package() {
+    cd hdr10plus_tool/hdr10plus
+
+    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo cinstall \
+        --release --frozen --prefix /usr \
+        --destdir "${pkgdir}"
+
+    install -Dm644 LICENSE "${pkgdir}/usr/share/licenses/${_pkgname}/LICENSE"
+}
