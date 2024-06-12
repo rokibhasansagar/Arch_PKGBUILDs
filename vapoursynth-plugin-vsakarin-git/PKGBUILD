@@ -1,0 +1,55 @@
+#!/hint/bash
+
+_plug=vsakarin
+pkgname=vapoursynth-plugin-${_plug}-git
+pkgver=0.96f.2.g8b7ff6d
+pkgrel=3
+pkgdesc="Plugin for Vapoursynth: ${_plug} (GIT version)"
+arch=('x86_64')
+url='https://github.com/akarinVS/vapoursynth-plugin.git'
+license=('GPL')
+depends=(
+    'vapoursynth'
+    'gcc-libs' # libgcc_s.so libstdc++.so
+    'glibc' # ld-linux-x86-64.so libc.so libm.so
+    'llvm16-libs' # libLLVM-16.so
+)
+makedepends=(
+    'git'
+    'meson'
+    'llvm16'
+)
+provides=("vapoursynth-plugin-${_plug}")
+conflicts=("vapoursynth-plugin-${_plug}")
+source=("${_plug}::git+https://github.com/rokibhasansagar/vapoursynth-plugin-vsakarin.git")
+sha256sums=('SKIP')
+options=('debug')
+
+pkgver() {
+    echo "0.96f.2.g8b7ff6d"
+    # cd "${_plug}" && echo "$(git describe --long --tags | tr - . | tr -d v)"
+}
+
+prepare() {
+    # sed -i "153,155d" ${_plug}/expr2/reactor/LLVMJIT.cpp
+    # if grep -q "\-x86-asm-syntax=intel" ${_plug}/expr2/reactor/LLVMJIT.cpp; then echo "VSAkarin Patch Failed"; fi
+    cat > native_config <<EOF
+[binaries]
+llvm-config = '/usr/lib/llvm16/bin/llvm-config'
+EOF
+}
+
+build() {
+    arch-meson "${_plug}" build \
+        --buildtype=release \
+        --native-file=native_config \
+        -Dstatic-llvm=false
+
+    meson compile -C build
+}
+
+package() {
+    DESTDIR="${pkgdir}" meson install -C build
+
+    install -Dm644 "${_plug}/README.md" "${pkgdir}/usr/share/doc/vapoursynth/plugins/${_plug}/README.md"
+}
