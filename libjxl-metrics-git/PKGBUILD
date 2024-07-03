@@ -74,7 +74,7 @@ prepare() {
     git -C libjxl config --local submodule.third_party/lcms.url "${srcdir}/Little-CMS"
     # git -C libjxl config --local submodule.third_party/gflags.url "${srcdir}/gflags"
     git -C libjxl config --local submodule.third_party/testdata.url "${srcdir}/libjxl-testdata"
-    git -C libjxl -c protocol.file.allow='always' submodule update
+    git -C libjxl -c protocol.file.allow='always' submodule update --recommend-shallow
 }
 
 pkgver() {
