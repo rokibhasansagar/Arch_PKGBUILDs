@@ -11,8 +11,9 @@ makedepends=('git' 'cargo' 'nasm' 'clang')
 depends=('ffmpeg' 'aom' 'vapoursynth')
 optdepends=(
     'svt-av1: SVT-AV1 encoder support'
-    'rav1e: rav1e encoder support'
-    'libvpx: vpx encoder support'
+    'rav1e: rAV1e encoder support'
+    'x265: HEVC encoder support'
+    'libvpx: VPX encoder support'
     'vmaf: VMAF calculation support'
     'mkvtoolnix-cli: mkvmerge support'
     'ffms2'
