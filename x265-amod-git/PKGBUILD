@@ -13,6 +13,7 @@ provides=('x265' 'libx265.so')
 # source=('git+https://github.com/rokibhasansagar/x265_mirror.git#branch=zMod-3.5')
 source=('x265_mirror::git+https://github.com/DJATOM/x265-aMod.git#branch=aMod-3.6-final')
 sha256sums=('SKIP')
+options=('!debug')
 
 pkgver() {
     git -C x265_mirror describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
@@ -21,7 +22,6 @@ pkgver() {
 prepare() {
     sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 209)' x265_mirror/source/CMakeLists.txt
     case "${TARGETPLATFORM}" in
-        "linux/amd64") export targetmarch="x86-64" ;;
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
         *) export targetmarch="native" ;;

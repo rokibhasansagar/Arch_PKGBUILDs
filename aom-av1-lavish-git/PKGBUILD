@@ -12,6 +12,7 @@ depends=('gcc-libs' 'glibc' 'vmaf' 'libjxl-metrics-git')
 makedepends=('cmake' 'ninja' 'nasm' 'git')
 source=('git+https://github.com/Clybius/aom-av1-lavish.git#branch=opmox/mainline-merge')
 sha256sums=('SKIP')
+options=('!debug')
 
 pkgver() {
     printf "r%s.%s" "$(git -C ${pkgname%-git} rev-list --count HEAD)" "$(git -C ${pkgname%-git} rev-parse --short HEAD)"
@@ -20,7 +21,6 @@ pkgver() {
 prepare() {
     sed -i 's/-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0/-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2/g' ${pkgname%-git}/build/cmake/aom_configure.cmake
     case "${TARGETPLATFORM}" in
-        "linux/amd64") export targetmarch="x86-64" ;;
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
         *) export targetmarch="native" ;;

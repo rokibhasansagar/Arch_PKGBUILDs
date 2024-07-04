@@ -27,7 +27,7 @@ provides=("vapoursynth-plugin-${_plug}")
 # conflicts=("vapoursynth-plugin-${_plug}")
 source=("${_plug}::git+https://github.com/AkarinVS/L-SMASH-Works.git#branch=ffmpeg-4.5")
 sha256sums=('SKIP')
-options=('debug')
+options=('!debug')
 
 pkgver() {
     git -C "${_plug}" describe --long --tags | tr - . | tr -d v

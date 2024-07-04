@@ -18,6 +18,7 @@ source=("${_pkgname}::git+https://github.com/dnjulek/vapoursynth-julek-plugin.gi
 
 b2sums=('SKIP'
         'SKIP')
+options=('!debug')
 
 prepare() {
     sed '/CMAKE_BUILD_TYPE Release/d' -i ${_pkgname}/CMakeLists.txt

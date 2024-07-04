@@ -31,6 +31,7 @@ source=(
 sha256sums=(
   'SKIP'
 )
+options=('!debug')
 
 pkgver() {
   cd "$_pkgsrc"

@@ -15,6 +15,7 @@ conflicts=("vapoursynth-plugin-${_plug}")
 # source=("$_plug::git+https://git.kageru.moe/kageru/adaptivegrain.git")
 source=("https://git.kageru.moe/kageru/adaptivegrain/archive/master.tar.gz")  # Gitea is R3KT
 sha256sums=('SKIP')
+options=('!debug')
 
 # Test source unpack directory
 prepare() {

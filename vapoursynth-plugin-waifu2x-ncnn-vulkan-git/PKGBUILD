@@ -31,7 +31,7 @@ sha256sums=(
     'SKIP'
     'e3b7b0b71ca606031821ac5d63b4ff25ab6874e8521521585de4a308b2f974c9'
 )
-# options=('debug')
+options=('!debug')
 
 pkgver() {
     cd "${_plug}"

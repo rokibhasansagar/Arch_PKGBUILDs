@@ -10,7 +10,7 @@ license=('BSD' 'custom')
 depends=('gcc-libs')
 makedepends=('git' 'rust' 'nasm' 'cargo-c' 'libgit2')
 provides=("rav1e=$pkgver" 'librav1e.so')
-options=('staticlibs')
+options=('staticlibs' '!debug')
 source=("git+https://github.com/xiph/rav1e.git")   # #commit=f8d82b7
 sha256sums=('SKIP')
 
@@ -24,7 +24,6 @@ prepare() {
     sed -i -z 's|name = "git2"\nversion = "0.18.1"|name = "git2"\nversion = "0.18.3"|g' Cargo.lock
     sed -i 's|fbf97ba92db08df386e10c8ede66a2a0369bd277090afd8710e19e38de9ec0cd|232e6a7bfe35766bf715e55a88b39a700596c0ccfd88cd3680b4cdb40d66ef70|g' Cargo.lock
     case "${TARGETPLATFORM}" in
-        "linux/amd64") export targetmarch="x86-64" ;;
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
         *) export targetmarch="native" ;;

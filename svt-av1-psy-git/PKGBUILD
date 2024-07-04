@@ -12,11 +12,11 @@ makedepends=('git' 'cmake' 'nasm' 'libdovi-git' 'libhdr10plus-rs-git')
 provides=('svt-av1')
 source=('git+https://github.com/gianni-rosato/svt-av1-psy.git#branch=master')
 sha256sums=('SKIP')
+options=('!debug')
 
 prepare() {
     cd ${pkgname%-git}
     case "${TARGETPLATFORM}" in
-        "linux/amd64") export targetmarch="x86-64" ;;
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
         *) export targetmarch="native" ;;

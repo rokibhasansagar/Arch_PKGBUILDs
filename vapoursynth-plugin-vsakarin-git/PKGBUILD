@@ -23,7 +23,7 @@ provides=("vapoursynth-plugin-${_plug}")
 conflicts=("vapoursynth-plugin-${_plug}")
 source=("${_plug}::git+https://github.com/rokibhasansagar/vapoursynth-plugin-vsakarin.git")
 sha256sums=('SKIP')
-options=('debug')
+options=('!debug')
 
 pkgver() {
     echo "0.96f.2.g8b7ff6d"

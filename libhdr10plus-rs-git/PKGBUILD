@@ -14,6 +14,7 @@ makedepends=('git' 'cargo' 'cargo-c')
 provides=('libhdr10plus-rs' 'libhdr10plus-rs.so')
 source=("git+https://github.com/quietvoid/hdr10plus_tool.git")
 sha256sums=('SKIP')
+options=('!debug')
 
 pkgver() {
     git -C hdr10plus_tool describe --match "libhdr10plus-[0-9]*" --long HEAD --tags | sed 's/^libhdr10plus-//;s/\([^-]*-g\)/r\1/;s/-/./g'
@@ -21,7 +22,6 @@ pkgver() {
 
 prepare() {
     case "${TARGETPLATFORM}" in
-        "linux/amd64") export targetmarch="x86-64" ;;
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
         *) export targetmarch="native" ;;

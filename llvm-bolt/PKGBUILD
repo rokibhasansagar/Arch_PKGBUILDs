@@ -8,7 +8,7 @@ url="https://github.com/llvm/llvm-project/tree/main/bolt"
 license=('custom:Apache 2.0 with LLVM Exception')
 arch=('x86_64')
 makedepends=('clang' 'cmake' 'ninja' 'llvm' 'llvm-libs' 'python' 'doxygen' 'python-sphinx')
-options=('!lto')
+options=('!lto' '!debug')
 source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/llvm-project-$pkgver.src.tar.xz"{,.sig})
 sha512sums=(
     '6d85bf749e0d77553cc215cbfa61cec4ac4f4f652847f56f946b6a892a99a5ea40b6ab8b39a9708a035001f007986941ccf17e4635260a8b0c1fa59e78d41e30'

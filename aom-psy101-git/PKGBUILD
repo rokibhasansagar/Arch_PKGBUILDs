@@ -12,6 +12,7 @@ depends=('gcc-libs' 'glibc' 'vmaf' 'libjxl-metrics-git')
 makedepends=('cmake' 'ninja' 'nasm' 'git')
 source=('git+https://gitlab.com/damian101/aom-psy101.git#branch=psy101')
 sha256sums=('SKIP')
+options=('!debug')
 
 pkgver() {
     _relver="3.8.2"
@@ -21,7 +22,6 @@ pkgver() {
 prepare() {
     sed -i 's/-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0/-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2/g' ${pkgname%-git}/build/cmake/aom_configure.cmake
     case "${TARGETPLATFORM}" in
-        "linux/amd64") export targetmarch="x86-64" ;;
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
         *) export targetmarch="native" ;;

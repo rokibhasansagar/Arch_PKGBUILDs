@@ -13,6 +13,7 @@ provides=('highway')
 conflicts=('highway')
 source=('git+https://github.com/google/highway.git')
 sha256sums=('SKIP')
+options=('!debug')
 
 pkgver() {
     git -C highway describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'

@@ -62,7 +62,7 @@ sha256sums=(
     'SKIP'
     'SKIP'
 )
-options=('!lto')
+options=('!lto' '!debug')
 
 prepare() {
     git -C libjxl submodule init

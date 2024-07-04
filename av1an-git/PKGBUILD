@@ -22,6 +22,7 @@ optdepends=(
 provides=('av1an')
 source=("git+https://github.com/master-of-zen/Av1an.git")
 sha256sums=('SKIP')
+options=('!debug')
 
 pkgver() {
     cd "Av1an"
@@ -31,7 +32,6 @@ pkgver() {
 prepare() {
     cd "Av1an"
     case "${TARGETPLATFORM}" in
-        "linux/amd64") export targetmarch="x86-64" ;;
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
         *) export targetmarch="native" ;;

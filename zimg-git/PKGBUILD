@@ -29,7 +29,7 @@ sha256sums=(
     'SKIP'
     'SKIP'
 )
-options=('debug')
+options=('!debug')
 
 pkgver() {
     git -C zimg describe --long --tags | tr - . | sed 's|release.||g'

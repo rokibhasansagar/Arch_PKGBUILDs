@@ -9,16 +9,15 @@ url='https://gitlab.com/AOMediaCodec/SVT-AV1/'
 license=('BSD' 'custom: Alliance for Open Media Patent License 1.0')
 depends=('glibc')
 makedepends=('git' 'cmake' 'nasm' 'clang' 'libdovi-git' 'libhdr10plus-rs-git')
-# options=('!strip')
 provides=('svt-av1')
 conflicts=('svt-av1')
 source=('git+https://github.com/gianni-rosato/svt-av1-psy.git#branch=master')
 sha256sums=('SKIP')
+options=('!debug') # options=('!strip')
 
 prepare() {
     cd ${pkgname%-git}
     case "${TARGETPLATFORM}" in
-        "linux/amd64") export targetmarch="x86-64" ;;
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
         *) export targetmarch="native" ;;
