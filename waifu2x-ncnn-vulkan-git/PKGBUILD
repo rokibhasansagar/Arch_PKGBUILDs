@@ -54,10 +54,10 @@ build() {
     -B build
     -S "$_pkgsrc/src"
     -G Ninja
-    -DCMAKE_BUILD_TYPE=None
+    -DCMAKE_BUILD_TYPE=Release
     -DCMAKE_INSTALL_PREFIX='/usr'
-    -DUSE_SYSTEM_NCNN=ON
-    -DUSE_SYSTEM_WEBP=ON
+    -DUSE_SYSTEM_NCNN='ON'
+    -DUSE_SYSTEM_WEBP='ON'
     -Wno-dev
   )
 

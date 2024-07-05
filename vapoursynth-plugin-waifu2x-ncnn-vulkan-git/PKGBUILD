@@ -2,8 +2,8 @@
 
 _plug=waifu2x-ncnn-vulkan
 pkgname=vapoursynth-plugin-${_plug}-git
-pkgver=5.0.gdb24b7f
-pkgrel=1
+pkgver=5.0.gf91e9e9
+pkgrel=2
 pkgdesc="Plugin for Vapoursynth: ${_plug} (GIT version)"
 arch=('x86_64')
 url='https://github.com/Nlzy/vapoursynth-waifu2x-ncnn-vulkan'
@@ -12,6 +12,7 @@ depends=(
     'vapoursynth'
     'vulkan-icd-loader'
     'glslang'
+    'ncnn'
 )
 makedepends=(
     'git'
@@ -22,7 +23,8 @@ makedepends=(
 provides=("vapoursynth-plugin-${_plug}")
 conflicts=("vapoursynth-plugin-${_plug}")
 source=(
-    "${_plug}::git+https://github.com/Nlzy/VapourSynth-${_plug}.git"
+    # "${_plug}::git+https://github.com/Nlzy/VapourSynth-${_plug}.git"
+    "${_plug}::git+https://github.com/rokibhasansagar/vapourSynth-${_plug}.git#branch=rokibhasansagar-patchfix"
     'git+https://github.com/Tencent/ncnn.git'
     'https://github.com/Nlzy/vapoursynth-waifu2x-ncnn-vulkan/releases/download/r0.1/models.7z'
 )
@@ -33,15 +35,13 @@ sha256sums=(
 )
 options=('!debug')
 
-pkgver() {
-    cd "${_plug}"
-    git describe --long --tags | tr - . | tr -d r
-}
+# pkgver() {
+#     cd "${_plug}"
+#     git describe --long --tags | tr - . | tr -d r
+# }
 
 prepare() {
     cd "${_plug}"
-    curl -sL "https://patch-diff.githubusercontent.com/raw/nihui/waifu2x-ncnn-vulkan/pull/200.patch" -O
-    patch -p1 -i 200.patch || true
     git config submodule.deps/ncnn.url "${srcdir}/ncnn"
     git -c protocol.file.allow=always submodule update --init --recommend-shallow \
         deps/ncnn
@@ -57,9 +57,11 @@ prepare() {
 build() {
     cmake -S "${_plug}" -B build \
         -DCMAKE_BUILD_TYPE=Release \
-        -DCMAKE_INSTALL_PREFIX=/usr \
-        -DNCNN_SYSTEM_GLSLANG=ON \
-        -DGLSLANG_TARGET_DIR=/usr/lib/cmake
+        -DCMAKE_INSTALL_PREFIX='/usr' \
+        -DUSE_SYSTEM_NCNN='ON' \
+        -DNCNN_SYSTEM_GLSLANG='ON' \
+        -DGLSLANG_TARGET_DIR='/usr/lib/cmake' \
+        -Wno-dev
 
     cmake --build build
 }
@@ -67,7 +69,7 @@ build() {
 package(){
     install -Dm755 "build/libvsw2xnvk.so" "${pkgdir}/usr/lib/vapoursynth/libvsw2xnvk.so"
 
-    find models* -type f | while read -r i; do install -Dm644 "${i}"  "${pkgdir}/usr/lib/vapoursynth/${_plug}-models/${i}"; done
+    find models* -type f | while read -r i; do install -Dm644 "${i}" "${pkgdir}/usr/lib/vapoursynth/${_plug}-models/${i}"; done
 
     install -Dm644 "${_plug}/README.md" "${pkgdir}/usr/share/doc/vapoursynth/plugins/${_plug}/README"
     install -Dm644 "${_plug}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
