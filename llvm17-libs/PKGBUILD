@@ -5,7 +5,7 @@ _pkgver_major=17
 _pkgver_minor=0
 _pkgver_patch=6
 # Package Release Version
-_pkgrel=6
+_pkgrel=7
 
 # LLVM Installation Directory
 _llvm_install_dir="/usr/lib/llvm$_pkgver_major"
@@ -158,15 +158,13 @@ package_llvm17() {
     # python3 setup.py install --root="$pkgdir" -O1
     # popd
 
-    ls -lAog "$pkgdir/$_llvm_install_dir"/lib/*.so*
-
     # Remove generic llvm libraries
     # rm "$pkgdir/$_llvm_install_dir"/lib/lib{LLVM,LTO,Remarks}.so
 
     # The runtime libraries go into llvm$_pkgver_major-libs
     mv -f "$pkgdir/$_llvm_install_dir"/lib/libLLVM-{$_pkgver_major,$pkgver}.so "$srcdir/"
-    # mv -f "$pkgdir/$_llvm_install_dir"/lib/lib{LLVM,LLVM-$_pkgver_major,LTO,Remarks}.so* "$srcdir"
-    mv -f "$pkgdir/$_llvm_install_dir"/lib/LLVMgold.so "$srcdir"
+    # mv -f "$pkgdir/$_llvm_install_dir"/lib/lib{LLVM,LLVM-$_pkgver_major,LTO,Remarks}.so "$srcdir"
+    mv -f "$pkgdir/$_llvm_install_dir"/lib/LLVMgold.so "$srcdir/"
 
     # Remove documentation sources, if -DLLVM_BUILD_DOCS=ON
     # rm -r "$pkgdir"/usr/lib/llvm$_pkgver_major/share/doc/llvm/html/{_sources,.buildinfo}
@@ -188,16 +186,18 @@ package_llvm17-libs() {
 
     install -d "$pkgdir/$_llvm_install_dir/lib"
     cp -P "$srcdir"/libLLVM-{$_pkgver_major,$pkgver}.so "$pkgdir/usr/lib/"
+    ln -s "../../libLLVM-$_pkgver_major.so" "$pkgdir/$_llvm_install_dir/lib/libLLVM-$_pkgver_major.so"
+    ln -s "../../libLLVM-$_pkgver_major.so" "$pkgdir/$_llvm_install_dir/lib/libLLVM-$pkgver.so"
     # cp -P "$srcdir"/lib{LLVM,LLVM-$_pkgver_major,LTO,Remarks}.so* "$pkgdir"/usr/lib/
     cp -P "$srcdir"/LLVMgold.so "$pkgdir/$_llvm_install_dir"/lib/
 
     # Symlinks from llvm install dir
-    local _so_prefix
-    for _so_prefix in libLLVM libLTO libRemarks; do
-        ln -s "../../$_so_prefix.so.$_pkgver_major.$_pkgver_minor" "$pkgdir/$_llvm_install_dir/lib/$_so_prefix.so"
-        ln -s "../../$_so_prefix.so.$_pkgver_major.$_pkgver_minor" "$pkgdir/$_llvm_install_dir/lib/$_so_prefix.so.$_pkgver_major.$_pkgver_minor"
-    done
-    ln -s "../../libLLVM.so.$_pkgver_major.$_pkgver_minor" "$pkgdir/$_llvm_install_dir/lib/libLLVM-$_pkgver_major.so"
+    # local _so_prefix
+    # for _so_prefix in libLLVM libLTO libRemarks; do
+    #     # ln -s "../../$_so_prefix.so.$_pkgver_major.$_pkgver_minor" "$pkgdir/$_llvm_install_dir/lib/$_so_prefix.so"
+    #     ln -s "../../$_so_prefix.so.$_pkgver_major.$_pkgver_minor" "$pkgdir/$_llvm_install_dir/lib/$_so_prefix.so.$_pkgver_major.$_pkgver_minor"
+    # done
+    # ln -s "../../libLLVM.so.$_pkgver_major.$_pkgver_minor" "$pkgdir/$_llvm_install_dir/lib/libLLVM-$_pkgver_major.so"
 
     install -Dm644 "$srcdir/llvm-$pkgver.src/LICENSE.TXT" \
         "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
