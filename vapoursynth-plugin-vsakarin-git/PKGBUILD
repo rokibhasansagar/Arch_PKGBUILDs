@@ -8,16 +8,21 @@ pkgdesc="Plugin for Vapoursynth: ${_plug} (GIT version)"
 arch=('x86_64')
 url='https://github.com/akarinVS/vapoursynth-plugin.git'
 license=('GPL')
+
+# Whether to use the generic llvm package or not
+_native_llvm=false
+_llvm_ver=17
+
 depends=(
     'vapoursynth'
     'gcc-libs' # libgcc_s.so libstdc++.so
     'glibc' # ld-linux-x86-64.so libc.so libm.so
-    'llvm-libs' # libLLVM-17.so
+    'llvm$_llvm_ver-libs' # libLLVM-17.so
 )
 makedepends=(
     'git'
     'meson'
-    'llvm'  # llvm17
+    'llvm$_llvm_ver'  # llvm17
 )
 provides=("vapoursynth-plugin-${_plug}")
 conflicts=("vapoursynth-plugin-${_plug}")
@@ -25,18 +30,23 @@ source=("${_plug}::git+https://github.com/rokibhasansagar/vapoursynth-plugin-vsa
 sha256sums=('SKIP')
 options=('!debug')
 
-pkgver() {
-    echo "0.96f.2.g8b7ff6d"
-    # cd "${_plug}" && echo "$(git describe --long --tags | tr - . | tr -d v)"
-}
+# pkgver() {
+#     # echo "0.96f.2.g8b7ff6d"
+#     cd "${_plug}" && echo "$(git describe --long --tags | tr - . | tr -d v)"
+# }
 
 prepare() {
     # sed -i "153,155d" ${_plug}/expr2/reactor/LLVMJIT.cpp
     # if grep -q "\-x86-asm-syntax=intel" ${_plug}/expr2/reactor/LLVMJIT.cpp; then echo "VSAkarin Patch Failed"; fi
-    # llvm-config = '/usr/lib/llvm16/bin/llvm-config'
+
+    if [[ "$_native_llvm" = true ]]; then
+        _llvm_install_dir="/usr"
+    else
+        _llvm_install_dir="/usr/lib/llvm$_llvm_ver"
+    fi
     cat > native_config <<EOF
 [binaries]
-llvm-config = '/usr/bin/llvm-config'
+llvm-config = "$_llvm_install_dir/bin/llvm-config"
 EOF
 }
 
