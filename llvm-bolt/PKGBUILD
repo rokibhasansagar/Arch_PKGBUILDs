@@ -7,7 +7,7 @@ pkgdesc='a post-link optimizer developed to speed up large applications'
 url="https://github.com/llvm/llvm-project/tree/main/bolt"
 license=('custom:Apache 2.0 with LLVM Exception')
 arch=('x86_64')
-makedepends=('clang' 'cmake' 'ninja' 'llvm' 'llvm-libs' 'python' 'doxygen' 'python-sphinx')
+makedepends=('clang' 'cmake' 'ninja' 'llvm' 'llvm-libs' 'python')
 options=('!lto' '!debug')
 source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/llvm-project-$pkgver.src.tar.xz"{,.sig})
 sha512sums=(
@@ -28,7 +28,7 @@ build() {
         -DCMAKE_C_COMPILER=clang \
         -DCMAKE_CXX_COMPILER=clang++ \
         -DLLVM_INSTALL_UTILS=ON \
-        -DLLVM_BUILD_DOCS:BOOL=ON \
+        -DLLVM_BUILD_DOCS:BOOL=OFF \
         -DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
         -DLLVM_EXTERNAL_LIT=/usr/bin/lit \
         -DLLVM_ENABLE_PROJECTS="bolt" \
