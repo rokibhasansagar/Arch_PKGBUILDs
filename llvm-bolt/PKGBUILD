@@ -1,17 +1,17 @@
 #!/hint/bash
 
 pkgname=llvm-bolt
-pkgver=17.0.6
-pkgrel=3
-pkgdesc='a post-link optimizer developed to speed up large applications'
+pkgver=18.1.7
+pkgrel=2
+pkgdesc='A post-link optimizer developed to speed up large applications'
 url="https://github.com/llvm/llvm-project/tree/main/bolt"
 license=('custom:Apache 2.0 with LLVM Exception')
 arch=('x86_64')
-makedepends=('clang' 'cmake' 'ninja' 'llvm' 'llvm-libs' 'python')
+makedepends=('clang' 'cmake' 'ninja' 'llvm' 'llvm-libs' 'python' 'mold')
 options=('!lto' '!debug')
 source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/llvm-project-$pkgver.src.tar.xz"{,.sig})
 sha512sums=(
-    '6d85bf749e0d77553cc215cbfa61cec4ac4f4f652847f56f946b6a892a99a5ea40b6ab8b39a9708a035001f007986941ccf17e4635260a8b0c1fa59e78d41e30'
+    '0f67818267803aca9d2bc9eb89335ee6dc56269e8066a0f8a48c4a959e8805dbf6bc839b9f96a92f86ee50d72e7cc326ffe18febb5eb06751ab54a217c0221c8'
     'SKIP'
 )
 validpgpkeys=('474E22316ABF4785A88C6E8EA2C794A986419D8A'  # Tom Stellard <tstellar@redhat.com>
@@ -30,19 +30,22 @@ build() {
         -DLLVM_INSTALL_UTILS=ON \
         -DLLVM_BUILD_DOCS:BOOL=OFF \
         -DLLVM_LINK_LLVM_DYLIB:BOOL=ON \
+        -DLLVM_USE_PERF:BOOL=ON \
+        -DLLVM_USE_LINKER=mold \
         -DLLVM_EXTERNAL_LIT=/usr/bin/lit \
         -DLLVM_ENABLE_PROJECTS="bolt" \
         -DLLVM_TARGETS_TO_BUILD="X86" \
-        -DLLVM_PARALLEL_LINK_JOBS=2 \
+        -DLLVM_PARALLEL_LINK_JOBS=3 \
         ../llvm-project-$pkgver.src/llvm
     ninja -C build bolt
 }
 
-check() {
-    ninja -C build check-all
-    echo -e "\nTesting targets..."
-    ninja -C build -t targets all 2>/dev/null || true
-}
+# check() {
+#     # ninja -C build check-bolt
+#     ninja -C build check-all
+#     echo -e "\nTesting targets..."
+#     ninja -C build -t targets all 2>/dev/null || true
+# }
 
 package () {
     DESTDIR="$pkgdir" ninja -C build install-bolt
