@@ -1,0 +1,35 @@
+#!/hint/bash
+
+pkgname=zig-0.12-bin
+pkgver=0.12.1
+pkgrel=2
+pkgdesc='A general-purpose programming language and toolchain for maintaining robust, optimal, and reusable software (v0.12.1)'
+arch=('x86_64' 'aarch64')
+url='https://ziglang.org/'
+license=('GPL')
+provides=("zig=$pkgver")
+conflicts=('zig')
+source_x86_64=("https://ziglang.org/download/$pkgver/zig-linux-x86_64-$pkgver.tar.xz")
+source_aarch64=("https://ziglang.org/download/$pkgver/zig-linux-aarch64-$pkgver.tar.xz")
+
+package() {
+
+    cd "zig-linux-$CARCH-$pkgver"
+
+    install -Dm755 -t "$pkgdir/usr/bin/" zig
+
+    install -d "$pkgdir/usr/lib/zig/"
+    cp -r -t "$pkgdir/usr/lib/zig/" lib/*
+
+    install -d "$pkgdir/usr/include/"
+    ln -srf -t "$pkgdir/usr/include/" "$pkgdir/usr/lib/zig/zig.h"
+
+    install -d "$pkgdir/usr/share/doc/zig/"
+    cp -r -t "$pkgdir/usr/share/doc/zig/" doc/*
+
+    install -D -t "$pkgdir/usr/share/licenses/zig/" LICENSE
+}
+
+sha512sums_x86_64=('SKIP')
+sha512sums_aarch64=('SKIP')
+
