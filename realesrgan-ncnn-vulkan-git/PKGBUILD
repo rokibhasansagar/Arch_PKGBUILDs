@@ -1,19 +1,20 @@
 #!/hint/bash
 
-_pkgname="waifu2x-ncnn-vulkan"
+_pkgdir="Real-ESRGAN-ncnn-vulkan"
+_pkgname="realesrgan-ncnn-vulkan"
 pkgname="$_pkgname-git"
-pkgver=20220728.r0.g93ed2bc
+pkgver=0.2.0.r0.g37026f4
 pkgrel=2
-pkgdesc="NCNN Implementation of Waifu2x Converter"
-url="https://github.com/nihui/waifu2x-ncnn-vulkan"
+pkgdesc='NCNN implementation of Real-ESRGAN'
 arch=('x86_64')
+url='https://github.com/xinntao/Real-ESRGAN-ncnn-vulkan'
 license=('MIT')
-
 depends=(
     'gcc-libs'
     'libwebp'
     'ncnn'
     'vulkan-icd-loader'
+    'vulkan-driver'
 )
 makedepends=(
     'cmake'
@@ -28,38 +29,37 @@ provides=("$_pkgname")
 conflicts=("$_pkgname")
 
 source=(
-    "$_pkgname"::"git+$url.git"
+    "$_pkgdir"::"git+https://github.com/rokibhasansagar/Real-ESRGAN-ncnn-vulkan-mirror.git#branch=vulkan-ci-update"
+    'https://github.com/xinntao/Real-ESRGAN/releases/download/v0.2.5.0/realesrgan-ncnn-vulkan-20220424-ubuntu.zip'
 )
-sha256sums=(
-    'SKIP'
-)
+b2sums=('SKIP'
+        'c16c05c343501272f5b4df6db7e7f8c592c4f8c8170ca0a0181c4433d1889ddea702d65fc134013bdaca302eeeab6e5b6d6fbad407adb7a2afa0acbefd6f4eca')
 options=('!debug')
 
 pkgver() {
-    cd "$_pkgname"
-    git describe --long --tags --abbrev=7 \
-        | sed -E 's/^[^0-9]*//;s/([^-]*-g)/r\1/;s/-/./g'
+    echo "0.2.0.r0.g37026f4"
+    # cd "$_pkgdir"
+    # git describe --long --tags \
+    #     | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 prepare() {
-    cd "$_pkgname"
+    cd "$_pkgdir"
 
     # Update STB headers
     for _h in stb_image{,_write}.h; do
         curl -sL "https://github.com/nothings/stb/raw/master/$_h" -o src/$_h
     done
 
-    curl -sL "https://patch-diff.githubusercontent.com/raw/nihui/waifu2x-ncnn-vulkan/pull/200.patch" -O
-    patch -p1 -i 200.patch || true
-
     # Fix default model path
-    sed -i 's|path_t model = PATHSTR("models-cunet")|path_t model = PATHSTR("/usr/share/'"$_pkgname"'/models-cunet")|' src/main.cpp
+    sed -i 's|path_t model = PATHSTR("models")|path_t model = PATHSTR("/usr/share/'"$_pkgname"'/models")|' src/main.cpp
 }
 
 build() {
+
     local _cmake_options=(
         -B build
-        -S "$_pkgname/src"
+        -S "$_pkgdir/src"
         -G Ninja
         -DCMAKE_BUILD_TYPE=Release
         -DBUILD_SHARED_LIBS='OFF'
@@ -78,10 +78,10 @@ package() {
     install -d "$pkgdir/usr/bin"
     ln -s /usr/share/$_pkgname/$_pkgname "$pkgdir/usr/bin/$_pkgname"
 
-    install -Dm644 "$_pkgname/LICENSE" -t "$pkgdir/usr/share/licenses/$pkgname/"
+    install -Dm644 "$_pkgdir/LICENSE" -t "$pkgdir/usr/share/licenses/$pkgname/"
 
-    cd "$_pkgname/models"
-    for f in models-*/*; do
+    # cd "$_pkgname/models"
+    for f in models/*; do
         install -Dm644 "$f" "$pkgdir/usr/share/$_pkgname/$f"
     done
 }
