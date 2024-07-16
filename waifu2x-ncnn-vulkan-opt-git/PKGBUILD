@@ -1,0 +1,78 @@
+#!/hint/bash
+
+_pkgname="waifu2x-ncnn-vulkan-opt"
+pkgname="$_pkgname-git"
+pkgver=20240717.r3.gad82c0a
+pkgrel=1
+pkgdesc="NCNN Implementation of Waifu2x Converter"
+arch=('x86_64')
+url="https://github.com/nihui/waifu2x-ncnn-vulkan"
+license=('MIT')
+
+depends=(
+    'gcc-libs'
+    'libwebp'
+    'ncnn'
+    'vulkan-icd-loader'
+)
+makedepends=(
+    'cmake'
+    'git'
+    'glslang'
+    'ninja'
+    'vulkan-headers'
+    'openmp'
+)
+
+provides=("$_pkgname" "${_pkgname//\-opt}")
+conflicts=("$_pkgname")
+
+source=("$_pkgname"::"git+https://github.com/rokibhasansagar/waifu2x-ncnn-vulkan-opt.git#branch=edge")
+sha256sums=('SKIP')
+options=('!debug')
+
+prepare() {
+    cd "$_pkgname"
+
+    # Fix Code
+    sed -i '864,867d;760,763d;538,541d;373,376d' src/waifu2x.cpp
+
+    # Use the models submodule only
+    git submodule init
+    # git config --local "submodule.models.url" "${srcdir}/models"
+    git -c protocol.file.allow=always submodule update --recommend-shallow -- models
+
+    # Fix default model path
+    sed -i 's|path_t model = PATHSTR("models-cunet")|path_t model = PATHSTR("/usr/share/'"$_pkgname"'/models-cunet")|' src/main.cpp
+}
+
+build() {
+    local _cmake_options=(
+        -B build
+        -S "$_pkgname/src"
+        -G Ninja
+        -DCMAKE_BUILD_TYPE=Release
+        -DBUILD_SHARED_LIBS='OFF'
+        -DCMAKE_INSTALL_PREFIX='/usr'
+        -DUSE_SYSTEM_NCNN='ON'
+        -DUSE_SYSTEM_WEBP='ON'
+        -Wno-dev
+    )
+
+    cmake "${_cmake_options[@]}"
+    cmake --build build
+}
+
+package() {
+    install -Dm755 build/${_pkgname//\-opt} -t "$pkgdir/usr/share/$_pkgname/"
+    install -d "$pkgdir/usr/bin"
+    ln -s /usr/share/$_pkgname/${_pkgname//\-opt} "$pkgdir/usr/bin/${_pkgname//\-opt}"
+
+    install -Dm644 "$_pkgname/LICENSE" -t "$pkgdir/usr/share/licenses/$pkgname/"
+
+    cd "$_pkgname/models"
+    for f in models-*/*; do
+        install -Dm644 "$f" "$pkgdir/usr/share/$_pkgname/$f"
+    done
+}
+
