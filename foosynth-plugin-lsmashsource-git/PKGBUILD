@@ -21,11 +21,12 @@ makedepends=('git'
              'meson'
              'vapoursynth'
              'l-smash'
-             'ffmpeg4.4'
+             'ffmpeg'
              )
 provides=("vapoursynth-plugin-${_plug}")
 # conflicts=("vapoursynth-plugin-${_plug}")
-source=("${_plug}::git+https://github.com/AkarinVS/L-SMASH-Works.git#branch=ffmpeg-4.5")
+# source=("${_plug}::git+https://github.com/AkarinVS/L-SMASH-Works.git#branch=ffmpeg-4.5")
+source=("${_plug}::git+https://github.com/HomeOfAviSynthPlusEvolution/L-SMASH-Works.git")
 sha256sums=('SKIP')
 options=('!debug')
 
@@ -41,9 +42,7 @@ prepare() {
 
 build() {
     cd build
-    PKG_CONFIG_PATH=/usr/lib/ffmpeg4.4/pkgconfig \
-        CFLAGS=-D_XOPEN_SOURCE=500 \
-        arch-meson "../${_plug}/VapourSynth" \
+    arch-meson "../${_plug}/VapourSynth" \
         --buildtype=release
 
     ninja
@@ -51,6 +50,7 @@ build() {
 
 package_vapoursynth-plugin-lsmashsource-git() {
     DESTDIR="${pkgdir}" ninja -C build install
-    install -Dm644 "${_plug}/AviSynth/README" "${pkgdir}/usr/share/doc/vapoursynth/plugins/${_plug}/README"
+    # install -Dm644 "${_plug}/AviSynth/README" "${pkgdir}/usr/share/doc/vapoursynth/plugins/${_plug}/README"
+    install -Dm644 "${_plug}/VapourSynth/README.md" "${pkgdir}/usr/share/doc/vapoursynth/plugins/${_plug}/README"
 }
 
