@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=aom-psy101-git
-pkgver=3.8.2.r82.g5879ed71f
+pkgver=3.8.2.r87.gdf18b42d03
 pkgrel=2
 pkgdesc="aomenc-av1 psy101 fork"
 url="https://aomedia.googlesource.com/aom/"

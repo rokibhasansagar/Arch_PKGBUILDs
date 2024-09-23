@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=svt-av1-psy-git
-pkgver=2.1.0.A.r1.g37a5609b
+pkgver=2.2.1.r0.g7077c9ff
 pkgrel=3
 pkgdesc='Scalable Video Technology AV1 encoder and decoder (git version)'
 arch=('x86_64')
@@ -20,7 +20,7 @@ prepare() {
     case "${TARGETPLATFORM}" in
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
-        *) export targetmarch="native" ;;
+        *) export targetmarch="native" native="ON" ;;
     esac
 }
 
@@ -30,22 +30,24 @@ pkgver() {
 
 build() {
     export SuppressorFlags='-Wno-dev -Wno-unused-parameter -Wno-unused-variable -Wno-implicit-function-declaration -Wno-unused-result'
-    export CFLAGS_PGO_GENERATE="-march=${targetmarch:-native} -Ofast -fprofile-instr-generate=/tmp/svt-pgo/pgo.profraw"
+    export CFLAGS_PGO_GEN="-march=${targetmarch:-native} -Ofast -flto=full -fprofile-instr-generate=/tmp/svt-pgo/pgo.profraw"
     export CC='/usr/bin/clang'
     export CXX='/usr/bin/clang++'
+    export LD='/usr/bin/lld'
     export LDFLAGS+=' -Wl,-z,noexecstack'
     cmake -B build -S ${pkgname%-git} \
         -DCMAKE_INSTALL_PREFIX='/usr' \
         -DCMAKE_BUILD_TYPE='Release' \
         -DBUILD_SHARED_LIBS='ON' \
-        -DSVT_AV1_LTO='ON' \
-        -DSVT_AV1_PGO_DIR='/tmp/svt-pgo' \
-        -DENABLE_AVX512='ON' -DNATIVE='ON' \
+        -DSVT_AV1_LTO='OFF' \
+        -DENABLE_AVX512='OFF' \
+        -DNATIVE="${native:-OFF}" \
         -DBUILD_TESTING='OFF' \
         -DBUILD_DEC='OFF' \
-        -DCMAKE_C_FLAGS="$CFLAGS_PGO_GENERATE -DNDEBUG" \
-        -DCMAKE_CXX_FLAGS="$CFLAGS_PGO_GENERATE -DNDEBUG" \
-        -DCMAKE_EXE_LINKER_FLAGS="$CFLAGS_PGO_GENERATE" \
+        -DSVT_AV1_PGO_DIR='/tmp/svt-pgo' \
+        -DCMAKE_C_FLAGS="$CFLAGS_PGO_GEN -DNDEBUG" \
+        -DCMAKE_CXX_FLAGS="$CFLAGS_PGO_GEN -DNDEBUG" \
+        -DCMAKE_EXE_LINKER_FLAGS="$CFLAGS_PGO_GEN" \
         -DCMAKE_ASM_NASM_COMPILER="nasm" \
         -DLIBDOVI_FOUND=1 \
         -DLIBHDR10PLUS_RS_FOUND=1 \

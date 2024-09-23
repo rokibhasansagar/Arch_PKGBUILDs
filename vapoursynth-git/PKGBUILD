@@ -21,7 +21,7 @@ makedepends=(
 provides=('vapoursynth')
 conflicts=('vapoursynth')
 source=(
-    'git+https://github.com/vapoursynth/vapoursynth.git#commit=dc5a571'        #6969ede
+    'git+https://github.com/vapoursynth/vapoursynth.git#commit=5657c20'        #dc5a571
     'vapoursynth.xml'
     'wtfpl.txt'
 )
