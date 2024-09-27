@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=libjxl-metrics-git
-pkgver=0.10.3.r0.g4e4f49c5
+pkgver=0.11.0.r37.g4a3b22d2
 pkgrel=2
 pkgdesc="JPEG XL image format reference implementation with butteraugli, ssimulacra, and ssimulacra2 (git version)"
 arch=('x86_64')
@@ -13,11 +13,11 @@ makedepends=(
     'python' 'asciidoc' 'graphviz' 'xdg-utils' 'gflags' 'zlib' 'doxygen' 'python-sphinx'
 )
 provides=(
-    'libjxl' 'libjxl-git' 'libjpeg-xl-git' 'libjxl.so' 'libjxl.so=0.10-64'
-    'libjxl_threads.so' 'libjxl_threads.so=0.10-64'
+    'libjxl' 'libjxl-git' 'libjpeg-xl-git' 'libjxl.so' 'libjxl.so=0.11-64'
+    'libjxl_threads.so' 'libjxl_threads.so=0.11-64'
     'butteraugli' 'butteraugli-git' 'ssimulacra' 'ssimulacra-git' 'ssimulacra2' 'ssimulacra2-git'
     'libjxl-doc' 'libjxl-doc-git'
-    # 'libjxl_cms.so' 'libjxl_cms.so=0.10-64'
+    # 'libjxl_cms.so' 'libjxl_cms.so=0.11-64'
     #'libjxl.so=0.8-64' 'libjxl_threads.so=0.8-64' 'libjxl_cms.so=0.8-64'
 )
 conflicts=(
@@ -35,7 +35,7 @@ optdepends=(
     'libavif: for avif benchmarking'
 )
 source=(
-    'libjxl::git+https://github.com/libjxl/libjxl.git#tag=v0.10.3'  # '#commit=4e4f49c'
+    'libjxl::git+https://github.com/libjxl/libjxl.git#tag=v0.11.0'  # '#commit=4e4f49c'
     'brotli::git+https://github.com/google/brotli.git'
     'Little-CMS::git+https://github.com/mm2/Little-CMS.git'
     'googletest::git+https://github.com/google/googletest.git'
@@ -87,7 +87,7 @@ pkgver() {
 build() {
     # We "use" clang and lld as suggested by the repo
     export LDFLAGS="-fuse-ld=lld -Wl,--thinlto-jobs=all"
-    export CFLAGS+=" -O3 -flto=thin" CXXFLAGS+=" -O3 -flto=thin"
+    export CFLAGS+=" -O3 -flto=thin -DNDEBUG -ffat-lto-objects" CXXFLAGS+=" -O3 -flto=thin -DNDEBUG -ffat-lto-objects"
     export CC=clang CXX=clang++
 
     cmake -B build -S libjxl -G 'Unix Makefiles' \
