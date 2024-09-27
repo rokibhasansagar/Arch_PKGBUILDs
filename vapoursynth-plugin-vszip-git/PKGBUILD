@@ -1,0 +1,33 @@
+#!/hint/bash
+
+_pkgname=vapoursynth-plugin-vszip
+pkgname=${_pkgname}-git
+pkgver=R2.r6.g0d0c580
+pkgrel=2
+pkgdesc='VapourSynth Zig Image Process Plugin'
+arch=('x86_64')
+url="https://github.com/dnjulek/vapoursynth-zip"
+license=('MIT')
+provides=('vapoursynth-plugin-vszip')
+conflicts=('vapoursynth-plugin-vszip')
+depends=('glibc')
+makedepends=('git' 'zig')
+source=("${_pkgname}::git+https://github.com/dnjulek/vapoursynth-zip.git")
+b2sums=('SKIP')
+options=('!debug')
+
+pkgver() {
+    git -C ${_pkgname} describe --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
+}
+
+build() {
+    cd ${_pkgname}
+    zig build -Doptimize=ReleaseFast
+}
+
+package() {
+    cd "${srcdir}"
+    install -Dm 644 ${_pkgname}/zig-out/lib/libvszip.so -t "${pkgdir}"/usr/lib/vapoursynth/
+    install -Dm 644 ${_pkgname}/LICENSE -t "${pkgdir}"/usr/share/licenses/${pkgname}/
+}
+

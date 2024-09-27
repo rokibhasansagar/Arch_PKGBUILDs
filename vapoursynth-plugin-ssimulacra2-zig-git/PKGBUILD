@@ -2,7 +2,7 @@
 
 _pkgname=vapoursynth-plugin-ssimulacra2-zig
 pkgname=${_pkgname}-git
-pkgver=r3.r6.gebe175a
+pkgver=r3.r7.ga1bc748
 pkgrel=2
 pkgdesc='A Vapoursynth plugin implementing SSIMULACRA2 written in Zig'
 arch=('x86_64')
