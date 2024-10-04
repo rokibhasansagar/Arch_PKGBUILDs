@@ -35,7 +35,7 @@ prepare() {
     cd "$_pkgname"
 
     # Fix Code
-    sed -i '864,867d;760,763d;538,541d;373,376d' src/waifu2x.cpp
+    sed -i '864,867d;760,763d;536,541d;373,376d' src/waifu2x.cpp
 
     # Use the models submodule only
     git submodule init
