@@ -23,7 +23,7 @@ provides=(
 )
 conflicts=('vapoursynth')
 source=(
-    'git+https://github.com/vapoursynth/vapoursynth.git#commit=3e78fb8'
+    'git+https://github.com/vapoursynth/vapoursynth.git#commit=40608b5'
     'vapoursynth.xml'
     'wtfpl.txt'
 )

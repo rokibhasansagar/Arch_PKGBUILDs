@@ -9,7 +9,7 @@ url="https://ziglang.org/"
 license=('MIT')
 provides=('zig')
 conflicts=('zig')
-makedepends=(jq)
+makedepends=('jq')
 optdepends=('curl: for downloading the latest version'
             'wget: alternative for downloading the latest version')
 options=('!strip')
