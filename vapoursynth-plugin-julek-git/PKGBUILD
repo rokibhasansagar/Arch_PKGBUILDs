@@ -34,11 +34,11 @@ pkgver() {
 build() {
     cd "${srcdir}"/${_pkgname}/thirdparty/libjxl/ && ./deps.sh
     cd "${srcdir}"/${_pkgname}/thirdparty && mkdir libjxl_build && cd libjxl_build
-    cmake -C ../libjxl_cache.cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -G Ninja ../libjxl
+    cmake -C ../libjxl_cache.cmake -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_C_COMPILER=clang -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -G Ninja ../libjxl
     cmake --build .
     cmake --install .
     cd ../..
-    cmake -B build -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -G Ninja
+    cmake -B build -DCMAKE_CXX_COMPILER=clang++ -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 -G Ninja
     cmake --build build
 }
 

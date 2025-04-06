@@ -2,7 +2,7 @@
 
 _pkgname=aom-psy101
 pkgname=$_pkgname-git
-pkgver=3.12.0.r127.58cf4e9818
+pkgver=3.12.0.r129.41810e4756
 pkgrel=2
 pkgdesc='Another aom psy fork'
 arch=(x86_64)
@@ -33,6 +33,7 @@ provides=(
 )
 source=($_pkgname::git+$url.git)
 sha256sums=(SKIP)
+options=('!debug')
 
 pkgver() {
     git -C $_pkgname describe --long --tags | \

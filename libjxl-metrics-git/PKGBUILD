@@ -2,7 +2,7 @@
 
 _pkgname=libjxl
 pkgname=$_pkgname-metrics-git
-pkgver=0.11.1.r190.0c1aba1d
+pkgver=0.11.1.r0.794a5dcf
 pkgrel=2
 pkgdesc='JPEG XL image format reference implementation with butteraugli, ssimulacra, and ssimulacra2 metrics (git version)'
 arch=(x86_64)
@@ -28,6 +28,7 @@ makedepends=(
 provides=(
     $_pkgname
     libjxl.so
+    libjxl_cms.so
     libjxl_threads.so
     butteraugli
     ssimulacra
@@ -71,7 +72,7 @@ prepare() {
 
 pkgver() {
     local _tag=$(git -C $_pkgname tag --list --sort=-v:refname 'v[[:digit:]]*' | sed 's/^v//;/[[:alpha:]]/d' | head -n1)
-    printf $_tag.r%s.%s $(git -C $_pkgname rev-list --count v$_tag..HEAD) $x(git -C $_pkgname rev-parse --short HEAD)
+    printf $_tag.r%s.%s $(git -C $_pkgname rev-list --count v$_tag..HEAD) $(git -C $_pkgname rev-parse --short HEAD)
 }
 
 build() {
@@ -91,6 +92,7 @@ build() {
         -DJPEGXL_ENABLE_PLUGINS=OFF \
         -DJPEGXL_FORCE_SYSTEM_BROTLI=ON \
         -DJPEGXL_FORCE_SYSTEM_HWY=ON \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         -Wno-dev
     make -C build
 }
