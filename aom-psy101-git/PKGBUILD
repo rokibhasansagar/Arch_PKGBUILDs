@@ -1,26 +1,47 @@
 #!/hint/bash
 
-pkgname=aom-psy101-git
-pkgver=3.8.2.r87.gdf18b42d03
+_pkgname=aom-psy101
+pkgname=$_pkgname-git
+pkgver=3.12.0.r129.41810e4756
 pkgrel=2
-pkgdesc="aomenc-av1 psy101 fork"
-url="https://aomedia.googlesource.com/aom/"
-arch=('x86_64')
-provides=('aom' 'aom-git' 'libaom.so')
-license=('BSD-3-Clause' 'custom:PATENTS')
-depends=('gcc-libs' 'glibc' 'vmaf' 'libjxl-metrics-git')
-makedepends=('cmake' 'ninja' 'nasm' 'git')
-source=('git+https://gitlab.com/damian101/aom-psy101.git#branch=psy101')
-sha256sums=('SKIP')
+pkgdesc='Another aom psy fork'
+arch=(x86_64)
+url=https://gitlab.com/damian101/aom-psy101
+license=(BSD-2-Clause custom:PATENTS)
+depends=(
+    gcc-libs
+    glibc
+)
+makedepends=(
+    git
+    cmake
+    ninja
+    clang
+    lld
+    perl
+    yasm
+    vmaf
+)
+optdepends=(
+    aom-docs
+    vmaf
+)
+provides=(
+    aom
+    aom-git
+    libaom.so
+)
+source=($_pkgname::git+$url.git)
+sha256sums=(SKIP)
 options=('!debug')
 
 pkgver() {
-    _relver="3.8.2"
-    printf "%s.r%s.g%s" "${_relver}" "$(git -C ${pkgname%-git} rev-list --count --committer="Damian" HEAD)" "$(git -C ${pkgname%-git} rev-parse --short HEAD)"
+    git -C $_pkgname describe --long --tags | \
+        sed -E 's/^v//; s/-([^-]*)-g([^-]*)$/-r\1.\2/; s/-/./g'
 }
 
 prepare() {
-    sed -i 's/-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0/-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2/g' ${pkgname%-git}/build/cmake/aom_configure.cmake
+    # sed -i 's/-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=0/-U_FORTIFY_SOURCE -D_FORTIFY_SOURCE=2/g' ${pkgname%-git}/build/cmake/aom_configure.cmake
     case "${TARGETPLATFORM}" in
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
@@ -29,17 +50,22 @@ prepare() {
 }
 
 build() {
+    export CC=clang CXX=clang++
+    export LDFLAGS+=' -fuse-ld=lld'
+    CFLAGS=${CFLAGS/_FORTIFY_SOURCE=3/_FORTIFY_SOURCE=0}
+    CXXFLAGS=${CXXFLAGS/_FORTIFY_SOURCE=3/_FORTIFY_SOURCE=0}
     export SuppressorFlags='-Wno-dev -Wno-unused-parameter -Wno-unused-variable -Wno-implicit-function-declaration -Wno-unused-result'
-    cmake -S ${pkgname%-git} -B build -G Ninja \
+    cmake -S $_pkgname -B build \
+        -G Ninja \
+        -DENABLE_TESTS=OFF \
+        -DENABLE_DOCS=OFF \
+        -DCONFIG_TUNE_VMAF=1 \
+        -DCONFIG_AV1_ENCODER=1 \
+        -DCONFIG_AV1_DECODER=1 \
+        -DBUILD_SHARED_LIBS=ON \
         -DCMAKE_BUILD_TYPE='Release' \
         -DCMAKE_INSTALL_PREFIX='/usr' \
         -DCMAKE_INSTALL_LIBDIR='lib' \
-        -DBUILD_SHARED_LIBS=1 \
-        -DCONFIG_TUNE_VMAF=1 \
-        -DCONFIG_TUNE_BUTTERAUGLI=0 \
-        -DCONFIG_AV1_ENCODER=1 \
-        -DCONFIG_AV1_DECODER=1 \
-        -DENABLE_TESTS=0 -DENABLE_DOCS=0 \
         -DENABLE_NASM='ON' \
         -DCMAKE_CXX_FLAGS="-flto -O3 -march=${targetmarch:-native}" \
         -DCMAKE_C_FLAGS="-flto -O3 -march=${targetmarch:-native} -pipe -fno-plt" \
@@ -50,5 +76,6 @@ build() {
 
 package() {
     DESTDIR="$pkgdir" cmake --install build
-    install -Dt "$pkgdir/usr/share/licenses/$pkgname" -m644 ${pkgname%-git}/{LICENSE,PATENTS}
+    install -Dm644 $_pkgname/{LICENSE,PATENTS} \
+        -t "$pkgdir/usr/share/licenses/$pkgname"
 }

@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=svt-av1-psy-git
-pkgver=2.2.1.r0.g7077c9ff
+pkgver=3.0.0.r0.g0abcdef0
 pkgrel=2
 pkgdesc='Scalable Video Technology AV1 encoder and decoder (git version)'
 arch=('x86_64')
@@ -10,7 +10,7 @@ license=('BSD' 'custom: Alliance for Open Media Patent License 1.0')
 depends=('glibc')
 makedepends=('git' 'cmake' 'nasm' 'libdovi-git' 'libhdr10plus-rs-git')
 provides=('svt-av1')
-source=('git+https://github.com/gianni-rosato/svt-av1-psy.git#branch=master')
+source=('git+https://github.com/psy-ex/svt-av1-psy.git#branch=master')
 sha256sums=('SKIP')
 options=('!debug')
 
@@ -24,7 +24,7 @@ prepare() {
 }
 
 pkgver() {
-    git -C ${pkgname%-git} describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
+    git -C ${pkgname%-git} describe --long --tags --always | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
 }
 
 build() {

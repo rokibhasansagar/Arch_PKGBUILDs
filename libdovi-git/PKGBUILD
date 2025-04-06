@@ -2,7 +2,7 @@
 
 _pkgname=libdovi
 pkgname=${_pkgname}-git
-pkgver=3.3.0.r8.g8fc10c8
+pkgver=3.3.1.r28.g866b7ca
 pkgrel=2
 pkgdesc='Library to read and write Dolby Vision metadata (C-API) - git version'
 arch=('x86_64')

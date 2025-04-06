@@ -2,7 +2,7 @@
 
 _plug=wnnm
 pkgname=vapoursynth-plugin-${_plug}-git
-pkgver=45.a8977b4
+pkgver=57.6d476bd
 pkgrel=2
 pkgdesc="Plugin for Vapoursynth: ${_plug} (GIT Version)"
 arch=('x86_64')

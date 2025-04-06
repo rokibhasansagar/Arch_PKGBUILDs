@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=x265-git
-pkgver=4.0.r4.gcdf897bfb
+pkgver=4.1.r141.gc505fb546
 pkgrel=3
 pkgdesc='Open source H.265/HEVC video encoder (git version)'
 arch=('x86_64')
@@ -20,8 +20,12 @@ pkgver() {
 }
 
 prepare() {
-    # TODO: revisit this, as x265-git is now v4.0, and arch might be updating that (`X265_BUILD 212`) in a week
-    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 209)' x265_git/source/CMakeLists.txt
+    # Un-break builds
+    git -C x265_git config --local user.email 10854164+rokibhasansagar@users.noreply.github.com
+    git -C x265_git config --local user.name rokibhasansagar
+    git -C x265_git revert a1fd812f3fd7bb85630cbaa931867c3cdbee7b4e --no-edit
+    # TODO: revisit this, as x265-git is now v4.1, and arch might be updating that (`X265_BUILD 212`) in a week
+    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 212)' x265_git/source/CMakeLists.txt
     case "${TARGETPLATFORM}" in
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
@@ -72,6 +76,7 @@ build() {
         -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.10 \
         ${SuppressorFlags}
     ln -s ../build-10/libx265.a build/libx265_main10.a
     ln -s ../build-12/libx265.a build/libx265_main12.a

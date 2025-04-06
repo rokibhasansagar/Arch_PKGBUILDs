@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=zimg-git
-pkgver=3.0.5.155.ga0fac0f
+pkgver=3.0.5.194.g7240030
 pkgrel=2
 pkgdesc="Scaling, colorspace conversion, and dithering library. (GIT version)"
 arch=('x86_64')
@@ -16,12 +16,12 @@ makedepends=(
     'cmake'
 )
 provides=(
-    "zimg=${pkgver}"
+    "zimg"
     'libzimg.so'
 )
 source=(
-    'git+https://bitbucket.org/the-sekrit-twc/zimg.git'
-    'git+https://bitbucket.org/the-sekrit-twc/graphengine.git'
+    'git+https://github.com/sekrit-twc/zimg.git'
+    'git+https://github.com/sekrit-twc/graphengine.git'
     'git+https://github.com/google/googletest.git'
 )
 sha256sums=(
@@ -72,4 +72,3 @@ package(){
 
     install -Dm644 zimg/COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
 }
-

@@ -54,6 +54,7 @@ build() {
         -DCMAKE_BUILD_TYPE=Release
         -DBUILD_SHARED_LIBS='OFF'
         -DCMAKE_INSTALL_PREFIX='/usr'
+        -DCMAKE_VERBOSE_MAKEFILE='ON'
         -DUSE_SYSTEM_NCNN='ON'
         -DUSE_SYSTEM_WEBP='ON'
         -Wno-dev

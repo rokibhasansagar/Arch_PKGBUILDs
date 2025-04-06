@@ -1,140 +1,105 @@
 #!/hint/bash
 
-pkgname=libjxl-metrics-git
-pkgver=0.11.0.r37.g4a3b22d2
+_pkgname=libjxl
+pkgname=$_pkgname-metrics-git
+pkgver=0.11.1.r0.794a5dcf
 pkgrel=2
-pkgdesc="JPEG XL image format reference implementation with butteraugli, ssimulacra, and ssimulacra2 (git version)"
-arch=('x86_64')
-url='https://jpeg.org/jpegxl/'
-license=('BSD')
-depends=('brotli' 'highway' 'gtest' 'libpng' 'lcms2' 'gperftools')
+pkgdesc='JPEG XL image format reference implementation with butteraugli, ssimulacra, and ssimulacra2 metrics (git version)'
+arch=(x86_64)
+url=https://jpeg.org/jpegxl/
+license=(BSD-3-Clause)
+depends=(
+    brotli
+    highway
+    libpng
+    libjpeg
+    giflib
+    openexr
+    gperftools
+)
 makedepends=(
-    'git' 'cmake' 'clang' 'lld' 'giflib' 'openexr' 'libjpeg-turbo'
-    'python' 'asciidoc' 'graphviz' 'xdg-utils' 'gflags' 'zlib' 'doxygen' 'python-sphinx'
+    git
+    cmake
+    clang
+    lld
+    python
+    asciidoc
 )
 provides=(
-    'libjxl' 'libjxl-git' 'libjpeg-xl-git' 'libjxl.so' 'libjxl.so=0.11-64'
-    'libjxl_threads.so' 'libjxl_threads.so=0.11-64'
-    'butteraugli' 'butteraugli-git' 'ssimulacra' 'ssimulacra-git' 'ssimulacra2' 'ssimulacra2-git'
-    'libjxl-doc' 'libjxl-doc-git'
-    # 'libjxl_cms.so' 'libjxl_cms.so=0.11-64'
-    #'libjxl.so=0.8-64' 'libjxl_threads.so=0.8-64' 'libjxl_cms.so=0.8-64'
+    $_pkgname
+    libjxl.so
+    libjxl_cms.so
+    libjxl_threads.so
+    butteraugli
+    ssimulacra
+    ssimulacra2
+    jpegli
 )
 conflicts=(
-    'libjxl-doc' 'libjxl-doc-git' 'libjpeg-xl-git'
-    'butteraugli' 'butteraugli-git' 'ssimulacra' 'ssimulacra-git' 'ssimulacra2' 'ssimulacra2-git'
-)
-replaces=(
-    'libjxl-git' 'libjpeg-xl-git'
+    $_pkgname
+    butteraugli
+    ssimulacra
+    ssimulacra2
+    jpegli
 )
 optdepends=(
-    'gdk-pixbuf2: for gdk-pixbuf loader'
-    'gimp: for building gimp jxl plugin'
-    'java-environment: for building FNI Java wrapper'
-    'libwebp: for webp benchmarking'
-    'libavif: for avif benchmarking'
+    'libjxl-doc: for documentation'
+)
+options=(
+    '!lto'  # Disabling pacman's LTO, as ThinLTO is enforced
+    '!debug'
 )
 source=(
-    'libjxl::git+https://github.com/libjxl/libjxl.git#tag=v0.11.0'  # '#commit=4e4f49c'
-    'brotli::git+https://github.com/google/brotli.git'
-    'Little-CMS::git+https://github.com/mm2/Little-CMS.git'
-    'googletest::git+https://github.com/google/googletest.git'
-    'sjpeg::git+https://github.com/webmproject/sjpeg.git'
-    'skcms::git+https://skia.googlesource.com/skcms.git'
-    'highway::git+https://github.com/google/highway.git'
-    'libpng::git+https://github.com/glennrp/libpng.git'
-    'zlib::git+https://github.com/madler/zlib.git'
-    # 'gflags::git+https://github.com/gflags/gflags.git'
-    'libjxl-testdata::git+https://github.com/libjxl/testdata.git'
-    'git+https://github.com/libjpeg-turbo/libjpeg-turbo.git'
+    git+https://github.com/libjxl/$_pkgname.git#tag=v0.11.1
+    git+https://skia.googlesource.com/skcms.git
+    git+https://github.com/webmproject/sjpeg.git
+    git+https://github.com/libjpeg-turbo/libjpeg-turbo.git
 )
 sha256sums=(
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    'SKIP'
-    # 'SKIP'
-    'SKIP'
-    'SKIP'
+    SKIP
+    SKIP
+    SKIP
+    SKIP
 )
-options=('!lto' '!debug')
 
 prepare() {
-    git -C libjxl submodule init
-
-    local _submodule
-    for _submodule in brotli googletest sjpeg skcms highway libpng zlib libjpeg-turbo; do
-        git -C libjxl config --local "submodule.third_party/${_submodule}.url" "${srcdir}/${_submodule}"
-    done
-    git -C libjxl config --local submodule.third_party/lcms.url "${srcdir}/Little-CMS"
-    # git -C libjxl config --local submodule.third_party/gflags.url "${srcdir}/gflags"
-    git -C libjxl config --local submodule.third_party/testdata.url "${srcdir}/libjxl-testdata"
-    git -C libjxl -c protocol.file.allow='always' submodule update --recommend-shallow
+    git -C $_pkgname submodule init third_party/{skcms,sjpeg,libjpeg-turbo}
+    git -C $_pkgname config submodule.third_party/skcms.url "$srcdir/skcms"
+    git -C $_pkgname config submodule.third_party/sjpeg.url "$srcdir/sjpeg"
+    git -C $_pkgname config submodule.third_party/libjpeg-turbo.url "$srcdir/libjpeg-turbo"
+    git -C $_pkgname -c protocol.file.allow=always submodule update
 }
 
 pkgver() {
-    local _tag
-    _tag="$(git -C libjxl tag --list --sort='-v:refname' 'v[[:digit:]]*' | sed 's/^v//;/[[:alpha:]]/d' | head -n1)"
-    printf "${_tag}.r%s.g%s" "$(git -C libjxl rev-list --count "v${_tag}..HEAD")" \
-        "$(git -C libjxl rev-parse --short HEAD)"
+    local _tag=$(git -C $_pkgname tag --list --sort=-v:refname 'v[[:digit:]]*' | sed 's/^v//;/[[:alpha:]]/d' | head -n1)
+    printf $_tag.r%s.%s $(git -C $_pkgname rev-list --count v$_tag..HEAD) $(git -C $_pkgname rev-parse --short HEAD)
 }
 
 build() {
-    # We "use" clang and lld as suggested by the repo
-    export LDFLAGS="-fuse-ld=lld -Wl,--thinlto-jobs=all"
-    export CFLAGS+=" -O3 -flto=thin -DNDEBUG -ffat-lto-objects" CXXFLAGS+=" -O3 -flto=thin -DNDEBUG -ffat-lto-objects"
     export CC=clang CXX=clang++
-
-    cmake -B build -S libjxl -G 'Unix Makefiles' \
-        -DBUILD_TESTING=0 \
+    export CFLAGS+=" -O3 -flto=thin -DNDEBUG -ffat-lto-objects" CXXFLAGS+=" -O3 -flto=thin -DNDEBUG -ffat-lto-objects"
+    # export CFLAGS+=' -flto=thin' CXXFLAGS+=' -flto=thin'
+    export LDFLAGS=" -fuse-ld=lld -Wl,--thinlto-jobs=all"
+    # export LDFLAGS+=' -fuse-ld=lld'
+    cmake -S $_pkgname -B build \
+        -G 'Unix Makefiles' \
+        -DBUILD_TESTING=OFF \
         -DCMAKE_BUILD_TYPE='Release' \
-        -DCMAKE_INSTALL_PREFIX='/usr' \
-        -DJPEGXL_ENABLE_DEVTOOLS=1 \
-        -DJPEGXL_ENABLE_PLUGINS=1 \
-        -DJPEGXL_ENABLE_BENCHMARK=0 \
-        -DJPEGXL_ENABLE_EXAMPLES=0 \
-        -DJPEGXL_ENABLE_FUZZERS=0 \
-        -DJPEGXL_FORCE_SYSTEM_BROTLI=1 \
-        -DJPEGXL_FORCE_SYSTEM_LCMS2=1 \
-        -DJPEGXL_FORCE_SYSTEM_GTEST=1 \
-        -DJPEGXL_FORCE_SYSTEM_HWY=1 \
-        -DJPEGXL_BUNDLE_LIBPNG=0 \
+        -DCMAKE_INSTALL_PREFIX=/usr \
+        -DJPEGXL_ENABLE_DEVTOOLS=ON \
+        -DJPEGXL_ENABLE_DOXYGEN=OFF \
+        -DJPEGXL_ENABLE_EXAMPLES=OFF \
+        -DJPEGXL_ENABLE_PLUGINS=OFF \
+        -DJPEGXL_FORCE_SYSTEM_BROTLI=ON \
+        -DJPEGXL_FORCE_SYSTEM_HWY=ON \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         -Wno-dev
-
-    make -C build all doc -j $(nproc)
-}
-
-check() {
-    ctest --test-dir build --output-on-failure
+    make -C build
 }
 
 package() {
-    # libjxl main
-    make -C build DESTDIR="$pkgdir" install
-    install -D -m644 libjxl/{LICENSE,PATENTS} -t "${pkgdir}/usr/share/licenses/${pkgname}"
-
-    # Docs
-    install -d -m755 "${pkgdir}/usr/share/doc"
-    install -D -m644 libjxl/{LICENSE,PATENTS} -t "${pkgdir}/usr/share/licenses/${pkgname}"
-    cp -dr --no-preserve='ownership' build/html "${pkgdir}/usr/share/doc/libjxl"
-
-    # Metrics
-    ln -s "/usr/bin/butteraugli_main" "$pkgdir/usr/bin/butteraugli"
-    ln -s "/usr/bin/ssimulacra_main" "$pkgdir/usr/bin/ssimulacra"
-
-    # Work around for outdated tools (use for #commit=4e4f49c)
-    # This will break in the future and needs to be kept track of
-    # ln -s "/usr/lib/libjxl.so.0.9.0" "$pkgdir/usr/lib/libjxl.so.0.8"
-    # ln -s "/usr/lib/libjxl.so.0.9.0" "$pkgdir/usr/lib/libjxl.so.0.8.0"
-    # ln -s "/usr/lib/libjxl_threads.so.0.9.0" "$pkgdir/usr/lib/libjxl_threads.so.0.8"
-    # ln -s "/usr/lib/libjxl_threads.so.0.9.0" "$pkgdir/usr/lib/libjxl_threads.so.0.8.0"
-    # ln -s "/usr/lib/libjxl.so.0.8.0" "$pkgdir/usr/lib/libjxl.so.0.10"
-    # ln -s "/usr/lib/libjxl.so.0.8.0" "$pkgdir/usr/lib/libjxl.so.0.10.3"
-    # ln -s "/usr/lib/libjxl_threads.so.0.8.0" "$pkgdir/usr/lib/libjxl_threads.so.0.10"
-    # ln -s "/usr/lib/libjxl_threads.so.0.8.0" "$pkgdir/usr/lib/libjxl_threads.so.0.10.3"
+    DESTDIR="$pkgdir" make -C build install
+    install -Dm644 $_pkgname/{LICENSE,PATENTS} -t "$pkgdir/usr/share/licenses/$pkgname"
+    ln -s /usr/bin/butteraugli_main "$pkgdir/usr/bin/butteraugli"
+    ln -s /usr/bin/ssimulacra_main "$pkgdir/usr/bin/ssimulacra"
 }

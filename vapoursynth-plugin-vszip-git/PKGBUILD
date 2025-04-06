@@ -2,7 +2,7 @@
 
 _pkgname=vapoursynth-plugin-vszip
 pkgname=${_pkgname}-git
-pkgver=R2.r6.g0d0c580
+pkgver=R5.r1.g381eee5
 pkgrel=2
 pkgdesc='VapourSynth Zig Image Process Plugin'
 arch=('x86_64')
@@ -11,7 +11,10 @@ license=('MIT')
 provides=('vapoursynth-plugin-vszip')
 conflicts=('vapoursynth-plugin-vszip')
 depends=('glibc')
-makedepends=('git' 'zig')
+makedepends=(
+    'git'
+    'zig'  # v0.15.0-dev.355 or later
+)
 source=("${_pkgname}::git+https://github.com/dnjulek/vapoursynth-zip.git")
 b2sums=('SKIP')
 options=('!debug')
@@ -22,7 +25,7 @@ pkgver() {
 
 build() {
     cd ${_pkgname}
-    zig build -Doptimize=ReleaseFast
+    zig build  # -Doptimize=ReleaseFast
 }
 
 package() {
