@@ -16,7 +16,7 @@ makedepends=(
     'cmake'
 )
 provides=(
-    "zimg=${pkgver}"
+    "zimg"
     'libzimg.so'
 )
 source=(
@@ -72,4 +72,3 @@ package(){
 
     install -Dm644 zimg/COPYING "${pkgdir}/usr/share/licenses/${pkgname}/COPYING"
 }
-
