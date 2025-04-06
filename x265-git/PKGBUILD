@@ -43,6 +43,7 @@ build() {
         -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         ${SuppressorFlags}
     cmake --build build-12
 
@@ -56,6 +57,7 @@ build() {
         -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         ${SuppressorFlags}
     cmake --build build-10
 
@@ -72,6 +74,7 @@ build() {
         -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
+        -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
         ${SuppressorFlags}
     ln -s ../build-10/libx265.a build/libx265_main10.a
     ln -s ../build-12/libx265.a build/libx265_main12.a
