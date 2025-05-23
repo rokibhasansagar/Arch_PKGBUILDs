@@ -22,7 +22,7 @@ makedepends=(
 provides=("vapoursynth-plugin-${_plug}")
 conflicts=("vapoursynth-plugin-${_plug}")
 source=(
-    "${_plug}::git+https://github.com/rokibhasansagar/vapoursynth-plugin-vsakarin.git"
+    "${_plug}::git+https://github.com/rokibhasansagar/vapoursynth-plugin-vsakarin.git#branch=llvm19"
 )
 sha256sums=(
     'SKIP'
