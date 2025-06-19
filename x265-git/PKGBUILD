@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=x265-git
-pkgver=4.1.r158.g6b250882c
+pkgver=4.1.r172.gcd40fe75d
 pkgrel=3
 pkgdesc='Open source H.265/HEVC video encoder (git version)'
 arch=('x86_64')
@@ -25,8 +25,8 @@ prepare() {
     # git -C x265_git config --local user.name rokibhasansagar
     # git -C x265_git revert a1fd812f3fd7bb85630cbaa931867c3cdbee7b4e --no-edit
     sed -i '/#include <limits>/a #include <cstdint>' x265_git/source/dynamicHDR10/json11/json11.cpp
-    # TODO: revisit this, as x265-git is now v4.1, and arch might be updating that (`X265_BUILD 212`) in a week
-    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 212)' x265_git/source/CMakeLists.txt
+    # TODO: revisit this, as x265-git is now v4.1, and arch might be updating that (`X265_BUILD 215`) in a week
+    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 215)' x265_git/source/CMakeLists.txt
     case "${TARGETPLATFORM}" in
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;

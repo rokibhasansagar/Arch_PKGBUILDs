@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=zimg-git
-pkgver=3.0.5.194.g7240030
+pkgver=3.0.5.206.gbde53c0
 pkgrel=2
 pkgdesc="Scaling, colorspace conversion, and dithering library. (GIT version)"
 arch=('x86_64')

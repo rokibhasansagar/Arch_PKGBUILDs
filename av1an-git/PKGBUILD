@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=av1an-git
-pkgver=r2356.118a58b
+pkgver=r2418.402296f
 pkgrel=2
 pkgdesc='A cross-platform all-in-one tool for streamlining AV1 encoding'
 arch=('x86_64')

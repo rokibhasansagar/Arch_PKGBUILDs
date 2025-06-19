@@ -2,7 +2,7 @@
 
 _pkgname=aom-psy101
 pkgname=$_pkgname-git
-pkgver=3.12.0.r129.41810e4756
+pkgver=3.12.1.r233.4c784954ff
 pkgrel=2
 pkgdesc='Another aom psy fork'
 arch=(x86_64)

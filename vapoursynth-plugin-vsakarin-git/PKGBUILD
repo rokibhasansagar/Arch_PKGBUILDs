@@ -2,7 +2,7 @@
 
 _plug=vsakarin
 pkgname=vapoursynth-plugin-${_plug}-git
-pkgver=0.96f.r132.1e0d846
+pkgver=0.96f.r132.2dd7831
 pkgrel=2
 pkgdesc="Plugin for Vapoursynth: ${_plug} (GIT version)"
 arch=('x86_64')
