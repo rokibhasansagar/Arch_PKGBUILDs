@@ -34,12 +34,6 @@ pkgver() {
     printf "0.96f.r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
-prepare() {
-    cd "${_plug}"
-    curl -sL "https://github.com/rokibhasansagar/vapoursynth-plugin-vsakarin/commit/2fb01859c34e10dfe2684c110adbb2bbe13a7073.patch" -O
-    patch -p1 -i "2fb01859c34e10dfe2684c110adbb2bbe13a7073.patch" || true
-}
-
 build() {
     arch-meson "${_plug}" build \
         --buildtype=release \

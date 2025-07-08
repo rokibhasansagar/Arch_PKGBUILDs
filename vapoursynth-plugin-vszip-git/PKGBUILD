@@ -13,7 +13,7 @@ conflicts=('vapoursynth-plugin-vszip')
 depends=('glibc')
 makedepends=(
     'git'
-    'zig-bin'  # v0.14.0
+    'zig-bin'  # v0.14.x
 )
 source=("${_pkgname}::git+https://github.com/dnjulek/vapoursynth-zip.git")
 b2sums=('SKIP')

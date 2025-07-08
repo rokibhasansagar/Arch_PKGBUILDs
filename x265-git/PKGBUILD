@@ -41,6 +41,7 @@ build() {
         -G 'Unix Makefiles' \
         -DCMAKE_INSTALL_PREFIX='/usr' \
         -DENABLE_SHARED='OFF' \
+        -DENABLE_HDR10_PLUS='ON' \
         -DHIGH_BIT_DEPTH='ON' \
         -DMAIN12='ON' \
         -DEXPORT_C_API='OFF' \
@@ -55,6 +56,7 @@ build() {
         -G 'Unix Makefiles' \
         -DCMAKE_INSTALL_PREFIX='/usr' \
         -DENABLE_SHARED='OFF' \
+        -DENABLE_HDR10_PLUS='ON' \
         -DHIGH_BIT_DEPTH='ON' \
         -DEXPORT_C_API='OFF' \
         -DENABLE_CLI='OFF' \

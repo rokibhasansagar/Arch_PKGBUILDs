@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=vapoursynth-git
-pkgver=R71.0.g40608b55
+pkgver=R72.11.g99aa2a08
 pkgrel=2
 pkgdesc="A video processing framework with simplicity in mind. (GIT version)"
 arch=('x86_64')
@@ -23,7 +23,7 @@ provides=(
 )
 conflicts=('vapoursynth')
 source=(
-    'git+https://github.com/vapoursynth/vapoursynth.git#commit=6c14df8'
+    'git+https://github.com/vapoursynth/vapoursynth.git#commit=99aa2a0'
     'vapoursynth.xml'
     'wtfpl.txt'
 )
