@@ -12,7 +12,7 @@ makedepends=('clang' 'cmake' 'llvm' 'llvm-libs' 'python' 'ninja' 'mold')
 options=('!lto' '!debug')
 source=("https://github.com/llvm/llvm-project/releases/download/llvmorg-$pkgver/llvm-project-$pkgver.src.tar.xz"{,.sig})
 sha256sums=(
-    '10b62d003f16afbd1a5ee0aa6397704c13d9a12a2562103998a8c1eff4a0f1ea'
+    'cd8fd55d97ad3e360b1d5aaf98388d1f70dfffb7df36beee478be3b839ff9008'
     'SKIP'
 )
 validpgpkeys=('474E22316ABF4785A88C6E8EA2C794A986419D8A'  # Tom Stellard <tstellar@redhat.com>
