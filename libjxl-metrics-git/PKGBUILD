@@ -69,7 +69,7 @@ prepare() {
     git -C $_pkgname config submodule.third_party/libjpeg-turbo.url "$srcdir/libjpeg-turbo"
     git -C $_pkgname -c protocol.file.allow=always submodule update
     # H@ck for faking v0.11.1 as v0.11.0 (Arch/ffmpeg needs that)
-    sed -i 's/set(JPEGXL_PATCH_VERSION 1)|set(JPEGXL_PATCH_VERSION 0)/g' $_pkgname/lib/CMakeLists.txt
+    sed -i 's|set(JPEGXL_PATCH_VERSION 1)|set(JPEGXL_PATCH_VERSION 0)|g' $_pkgname/lib/CMakeLists.txt
 }
 
 pkgver() {
