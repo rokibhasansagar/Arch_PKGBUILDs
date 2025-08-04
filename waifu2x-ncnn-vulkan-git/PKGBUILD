@@ -13,7 +13,7 @@ depends=(
     'gcc-libs'
     'ncnn'
     'libjpeg-turbo'
-    'zlib-ng-compat'
+    # 'zlib-ng-compat'  conflicts with zlib
     'libpng'
     'libwebp'
     'vulkan-icd-loader'
