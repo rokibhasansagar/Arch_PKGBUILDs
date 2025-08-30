@@ -2,7 +2,7 @@
 
 _pkgname="waifu2x-ncnn-vulkan"
 pkgname="$_pkgname-git"
-pkgver=20220728.r0.g93ed2bc
+pkgver=20250802.r3.g567ba9c
 pkgrel=2
 pkgdesc="NCNN Implementation of Waifu2x Converter"
 url="https://github.com/nihui/waifu2x-ncnn-vulkan"

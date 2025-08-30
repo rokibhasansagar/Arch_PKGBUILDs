@@ -1,13 +1,13 @@
 #!/hint/bash
 
 pkgname=av1an-git
-pkgver=r2418.402296f
+pkgver=r2488.0fa433c0
 pkgrel=2
 pkgdesc='A cross-platform all-in-one tool for streamlining AV1 encoding'
 arch=('x86_64')
 url='https://github.com/master-of-zen/Av1an'
 license=('GPL3')
-makedepends=('git' 'cargo' 'nasm' 'clang')
+makedepends=('git' 'rust' 'nasm' 'clang')
 depends=('ffmpeg' 'aom' 'vapoursynth')
 optdepends=(
     'svt-av1: SVT-AV1 encoder support'
@@ -16,8 +16,8 @@ optdepends=(
     'libvpx: VPX encoder support'
     'vmaf: VMAF calculation support'
     'mkvtoolnix-cli: mkvmerge support'
-    'ffms2'
-    'vapoursynth-plugin-lsmashsource'
+    'ffms2: FFMS2 chunk detection support'
+    'vapoursynth-plugin-lsmashsource: L-SMASH chunk detection support'
 )
 provides=('av1an')
 source=("git+https://github.com/master-of-zen/Av1an.git")
@@ -41,7 +41,7 @@ prepare() {
 
 build() {
     cd "Av1an"
-    export CFLAGS+=" -ffat-lto-objects"
+    local CFLAGS+=" -ffat-lto-objects"
     RUSTUP_TOOLCHAIN=stable RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" \
         cargo build --target "${arch}-unknown-linux-gnu" --release
 

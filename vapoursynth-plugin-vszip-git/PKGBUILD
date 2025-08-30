@@ -2,7 +2,7 @@
 
 _pkgname=vapoursynth-plugin-vszip
 pkgname=${_pkgname}-git
-pkgver=R5.r1.g381eee5
+pkgver=r174.6196307
 pkgrel=2
 pkgdesc='VapourSynth Zig Image Process Plugin'
 arch=('x86_64')
@@ -20,7 +20,8 @@ b2sums=('SKIP')
 options=('!debug')
 
 pkgver() {
-    git -C ${_pkgname} describe --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
+    cd ${_pkgname}
+    printf "r%s.%s" "$(git rev-list --count HEAD)" "$(git rev-parse --short HEAD)"
 }
 
 build() {

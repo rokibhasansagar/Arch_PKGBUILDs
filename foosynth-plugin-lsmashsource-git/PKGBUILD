@@ -3,7 +3,7 @@
 _plug=lsmashsource
 pkgbase=foosynth-plugin-${_plug}-git
 pkgname=("vapoursynth-plugin-${_plug}-git")
-pkgver=1253.0.0.0.2.g49246d1
+pkgver=1266.0.0.0.3.g4142f52
 pkgrel=2
 pkgdesc="Plugin for Vapoursynth: ${_plug} (GIT version)"
 arch=('x86_64')

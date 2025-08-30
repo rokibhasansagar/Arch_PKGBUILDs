@@ -1,14 +1,14 @@
 #!/hint/bash
 
 pkgname=x265-git
-pkgver=4.1.r172.gcd40fe75d
+pkgver=4.1.r191.g8f11c33ac
 pkgrel=3
 pkgdesc='Open source H.265/HEVC video encoder (git version)'
 arch=('x86_64')
 url='https://bitbucket.org/multicoreware/x265_git'
 license=('GPL')
 depends=('gcc-libs' 'numactl')
-makedepends=('git' 'cmake' 'nasm')
+makedepends=('git' 'cmake' 'ninja' 'nasm')
 provides=('x265' 'libx265.so')
 # conflicts=('x265')
 source=('git+https://bitbucket.org/multicoreware/x265_git.git')
@@ -21,9 +21,6 @@ pkgver() {
 
 prepare() {
     # Un-break builds
-    # git -C x265_git config --local user.email 10854164+rokibhasansagar@users.noreply.github.com
-    # git -C x265_git config --local user.name rokibhasansagar
-    # git -C x265_git revert a1fd812f3fd7bb85630cbaa931867c3cdbee7b4e --no-edit
     sed -i '/#include <limits>/a #include <cstdint>' x265_git/source/dynamicHDR10/json11/json11.cpp
     # TODO: revisit this, as x265-git is now v4.1, and arch might be updating that (`X265_BUILD 215`) in a week
     sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 215)' x265_git/source/CMakeLists.txt
@@ -35,53 +32,44 @@ prepare() {
 }
 
 build() {
-    export SuppressorFlags='-Wno-dev -Wno-unused-parameter -Wno-unused-variable -Wno-implicit-function-declaration -Wno-unused-result'
-    export CFLAGS_TUNING="-march=${targetmarch:-native} -O3"
-    cmake -S x265_git/source -B build-12 \
-        -G 'Unix Makefiles' \
-        -DCMAKE_INSTALL_PREFIX='/usr' \
-        -DENABLE_SHARED='OFF' \
-        -DENABLE_HDR10_PLUS='ON' \
-        -DHIGH_BIT_DEPTH='ON' \
-        -DMAIN12='ON' \
-        -DEXPORT_C_API='OFF' \
-        -DENABLE_CLI='OFF' \
-        -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
-        -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
-        -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
-        ${SuppressorFlags}
+    local SuppressorFlags=(
+        -Wno-dev -Wno-unused-parameter -Wno-unused-variable
+        -Wno-implicit-function-declaration -Wno-unused-result
+    )
+    local common_options=(
+        -S x265_git/source
+        -G Ninja
+        -D CMAKE_INSTALL_PREFIX=/usr
+        -D ENABLE_HDR10_PLUS=TRUE
+        -D CMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy'
+        -D CMAKE_C_FLAGS="-march=${targetmarch:-native} -O3"
+        -D CMAKE_CXX_FLAGS="-march=${targetmarch:-native} -O3"
+        "${SuppressorFlags[@]}"
+    ) hdr_options=(
+        "${common_options[@]}"
+        -D ENABLE_CLI=FALSE
+        -D ENABLE_SHARED=FALSE
+        -D EXPORT_C_API=FALSE
+        -D HIGH_BIT_DEPTH=TRUE
+    ) final_options=(
+        "${common_options[@]}"
+        -D ENABLE_CLI=TRUE
+        -D ENABLE_SHARED=TRUE
+        -D EXTRA_LIB='x265_main10.a;x265_main12.a'
+        -D EXTRA_LINK_FLAGS='-L .'
+        -D LINKED_10BIT=TRUE
+        -D LINKED_12BIT=TRUE
+    )
+
+    cmake -B build-12 "${hdr_options[@]}" -D MAIN12=TRUE
     cmake --build build-12
 
-    cmake -S x265_git/source -B build-10 \
-        -G 'Unix Makefiles' \
-        -DCMAKE_INSTALL_PREFIX='/usr' \
-        -DENABLE_SHARED='OFF' \
-        -DENABLE_HDR10_PLUS='ON' \
-        -DHIGH_BIT_DEPTH='ON' \
-        -DEXPORT_C_API='OFF' \
-        -DENABLE_CLI='OFF' \
-        -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
-        -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
-        -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
-        ${SuppressorFlags}
+    cmake -B build-10 "${hdr_options[@]}"
     cmake --build build-10
 
-    cmake -S x265_git/source -B build \
-        -G 'Unix Makefiles' \
-        -DCMAKE_INSTALL_PREFIX:PATH='/usr' \
-        -DENABLE_SHARED='ON' \
-        -DENABLE_HDR10_PLUS='ON' \
-        -DEXTRA_LIB='x265_main10.a;x265_main12.a' \
-        -DEXTRA_LINK_FLAGS='-L.' \
-        -DENABLE_CLI='ON' \
-        -DLINKED_10BIT='ON' \
-        -DLINKED_12BIT='ON' \
-        -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
-        -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
-        -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
-        ${SuppressorFlags}
-    ln -s ../build-10/libx265.a build/libx265_main10.a
-    ln -s ../build-12/libx265.a build/libx265_main12.a
+    cmake -B build "${final_options[@]}"
+    ln -sr build-10/libx265.a build/libx265_main10.a
+    ln -sr build-12/libx265.a build/libx265_main12.a
     cmake --build build
 }
 

@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=vapoursynth-git
-pkgver=R72.11.g99aa2a08
+pkgver=72.11.g99aa2a08
 pkgrel=2
 pkgdesc="A video processing framework with simplicity in mind. (GIT version)"
 arch=('x86_64')
