@@ -9,12 +9,12 @@ url='https://ziglang.org/'
 license=('GPL')
 provides=("zig=$pkgver")
 conflicts=('zig')
-source_x86_64=("https://ziglang.org/download/$pkgver/zig-linux-x86_64-$pkgver.tar.xz")
-source_aarch64=("https://ziglang.org/download/$pkgver/zig-linux-aarch64-$pkgver.tar.xz")
+source_x86_64=("https://ziglang.org/download/$pkgver/zig-x86_64-linux-$pkgver.tar.xz")
+source_aarch64=("https://ziglang.org/download/$pkgver/zig-aarch64-linux-$pkgver.tar.xz")
 
 package() {
 
-    cd "zig-linux-$CARCH-$pkgver"
+    cd "zig-$CARCH-linux-$pkgver"
 
     install -Dm755 -t "$pkgdir/usr/bin/" zig
 
