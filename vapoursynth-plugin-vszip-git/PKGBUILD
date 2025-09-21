@@ -2,7 +2,7 @@
 
 _pkgname=vapoursynth-plugin-vszip
 pkgname=${_pkgname}-git
-pkgver=r174.6196307
+pkgver=r176.34174f4
 pkgrel=2
 pkgdesc='VapourSynth Zig Image Process Plugin'
 arch=('x86_64')
@@ -13,7 +13,7 @@ conflicts=('vapoursynth-plugin-vszip')
 depends=('glibc')
 makedepends=(
     'git'
-    'zig-bin=0.14.1'  # v0.14.x
+    'zig-bin>=0.15.1'  # v0.15.1
 )
 source=("${_pkgname}::git+https://github.com/dnjulek/vapoursynth-zip.git")
 b2sums=('SKIP')
