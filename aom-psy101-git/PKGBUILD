@@ -2,7 +2,7 @@
 
 _pkgname=aom-psy101
 pkgname=$_pkgname-git
-pkgver=3.12.1.r327.7f4001d154
+pkgver=3.12.1.r395.e309e8b874
 pkgrel=2
 pkgdesc='Another aom psy fork'
 arch=(x86_64)
@@ -20,6 +20,7 @@ makedepends=(
     lld
     perl
     yasm
+    nasm
     vmaf
 )
 optdepends=(
