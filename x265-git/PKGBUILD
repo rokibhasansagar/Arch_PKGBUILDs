@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=x265-git
-pkgver=4.1.r191.g8f11c33ac
+pkgver=4.1.r201.gffba52bab
 pkgrel=3
 pkgdesc='Open source H.265/HEVC video encoder (git version)'
 arch=('x86_64')
