@@ -1,9 +1,9 @@
 #!/hint/bash
 
 pkgname=zig-bin
-pkgver=0.14.1
-pkgrel=2
-pkgdesc='A general-purpose programming language and toolchain for maintaining robust, optimal, and reusable software (v0.12.1)'
+pkgver=0.15.2
+pkgrel=3
+pkgdesc='A general-purpose programming language and toolchain for maintaining robust, optimal, and reusable software'
 arch=('x86_64' 'aarch64')
 url='https://ziglang.org/'
 license=('GPL')
