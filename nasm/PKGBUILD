@@ -4,7 +4,7 @@
 
 pkgname=nasm
 _pkgver=2.16.03
-epoch =5
+epoch=5
 pkgver=4.3.2
 pkgrel=1
 pkgdesc='80x86 assembler designed for portability and modularity'
