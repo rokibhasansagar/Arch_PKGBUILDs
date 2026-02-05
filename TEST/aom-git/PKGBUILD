@@ -1,0 +1,86 @@
+#!/hint/bash
+# Maintainer: Jan Alexander Steffens (heftig) <heftig@archlinux.org>
+# Contributor: Chocobo1 <chocobo1 AT archlinux DOT net>
+# Contributor: Rokib Hasan Sagar <rokibhasansagar20014 AT outlook DOT com>
+
+pkgname=(aom)
+pkgver=3.13.1.r221.g557586fde2f
+pkgrel=9
+
+pkgdesc="Alliance for Open Media (AOMedia) Video 1 (AV1) codec, providing royalty-free, high-efficiency video encoding and decoding"
+url="https://aomedia.org/"
+arch=(x86_64)
+license=(BSD-3-Clause)
+
+depends=(
+  gcc-libs
+  glibc
+)
+
+makedepends=(
+  git
+  cmake
+  ninja
+  perl
+  nasm
+)
+
+options=('!debug')
+
+provides=(
+  aom=$pkgver
+  libaom.so
+)
+
+conflicts=(aom)
+replaces=(aom)
+
+source=("aom::git+https://aomedia.googlesource.com/aom#commit=557586f")
+sha256sums=('SKIP')
+
+pkgver() {
+  cd "aom"
+  _tag=$(git tag -l --sort -v:refname | grep -E '^v?[0-9\.]+$' | head -n1)
+  _rev=$(git rev-list --count $_tag..HEAD)
+  _hash=$(git rev-parse --short HEAD)
+  printf "%s.r%s.g%s" "$_tag" "$_rev" "$_hash" | sed 's/^v//'
+}
+
+prepare() {
+  cd "aom"
+  # Don't require static library
+  sed -i 's/aom aom_static/aom/' build/cmake/aom_install.cmake
+}
+
+build() {
+  local cmake_options=(
+    -D CMAKE_BUILD_TYPE=Release
+    -D CMAKE_INSTALL_PREFIX=/usr
+    -D CMAKE_INSTALL_LIBDIR="lib"
+    -D BUILD_SHARED_LIBS=1
+    -D ENABLE_TESTS=0
+    -D ENABLE_DOCS=0
+  )
+  # upstream wants this off
+  CFLAGS="${CFLAGS/_FORTIFY_SOURCE=3/_FORTIFY_SOURCE=0}"
+  CXXFLAGS="${CXXFLAGS/_FORTIFY_SOURCE=3/_FORTIFY_SOURCE=0}"
+  # hack opt
+  CFLAGS="${CFLAGS} -march=native -O3 -DNDEBUG"
+  CXXFLAGS="${CXXFLAGS} -march=native -O3 -DNDEBUG"
+  LDFLAGS="${LDFLAGS} -march=native -O3"
+
+  cmake -S aom -B build -G Ninja "${cmake_options[@]}"
+  cmake --build build
+}
+
+package() {
+  provides=(
+    aom=$pkgver
+    libaom.so
+  )
+
+  DESTDIR="$pkgdir" cmake --install build
+
+  install -Dt "$pkgdir/usr/share/licenses/$pkgname" -m644 aom/{LICENSE,PATENTS}
+}
+
