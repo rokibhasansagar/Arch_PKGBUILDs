@@ -1,0 +1,61 @@
+#!/hint/bash
+# Maintainer: Josh Holmer <jholmer.in@gmail.com>
+# Contributor: Rokib Hasan Sagar <rokibhasansagar AT gmail DOT com>
+
+_plug=mlrt
+pkgname=vapoursynth-plugin-${_plug}-ort-cpu-runtime-git
+pkgver=683.845f2fb
+pkgrel=2
+pkgdesc="Plugin for VapourSynth: ${_plug} (ONNX runtime - CPU Only)"
+arch=('x86_64')
+url='https://github.com/AmusementClub/vs-mlrt'
+license=('LGPL')
+depends=('vapoursynth' 'onnx' 'onnxruntime-cpu' 'protobuf')
+makedepends=('git' 'ninja' 'cmake' 'jq')
+provides=("vapoursynth-plugin-${_plug}" "vapoursynth-plugin-${_plug}-ort-cpu-runtime-git")
+conflicts=("vapoursynth-plugin-${_plug}-ort-runtime-git")
+options=('!debug')
+
+# Function to fetch the latest release version
+get_latest_release_version() {
+  curl --silent "https://api.github.com/repos/AmusementClub/vs-mlrt/releases/latest" | jq -r .tag_name
+}
+
+# Fetch the latest release version
+latest_release=$(get_latest_release_version)
+
+source=("${_plug}::git+https://github.com/AmusementClub/vs-mlrt.git"
+  "models-${latest_release}.7z::https://github.com/AmusementClub/vs-mlrt/releases/download/${latest_release}/models.${latest_release}.7z")
+sha256sums=('SKIP' 'SKIP')
+
+pkgver() {
+  cd "${_plug}"
+
+  _rev=$(git rev-list --count --all)
+  _hash=$(git rev-parse --short HEAD)
+  printf "%s.%s" "$_rev" "$_hash"
+}
+
+build() {
+  cmake -S "${_plug}/vsort" -B build -G Ninja \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DVAPOURSYNTH_INCLUDE_DIRECTORY="/usr/include/vapoursynth" \
+    -DCMAKE_CXX_FLAGS="${CXXFLAGS} -ffast-math" \
+    -D ONNX_RUNTIME_API_DIRECTORY=/usr/include/onnxruntime \
+    -D ONNX_RUNTIME_LIB_DIRECTORY=/usr/lib \
+    -D CMAKE_CXX_STANDARD=20
+
+  cmake --build build
+}
+
+package() {
+  install -Dm755 "build/libvsort.so" "${pkgdir}/usr/lib/vapoursynth/libvsort.so"
+  for i in $(find models* -type f); do install -Dm644 "${i}" "${pkgdir}/usr/lib/vapoursynth/${i}"; done
+
+  _pythondir=$(python -c "import os; print(os.path.dirname(os.__file__))")
+  _sitedir="${_pythondir}/site-packages"
+  install -Dm644 "${_plug}/scripts/vsmlrt.py" "${pkgdir}${_sitedir}/vsmlrt.py"
+
+  install -Dm644 "${_plug}/README.md" "${pkgdir}/usr/share/doc/vapoursynth/tools/${_plug}/README.md"
+  install -Dm644 "${_plug}/LICENSE" "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+}
