@@ -1,13 +1,13 @@
 #!/hint/bash
 
 pkgname=x265-git
-pkgver=4.1.r201.gffba52bab
-pkgrel=3
+pkgver=4.2.r40.g6fdfffe8d
+pkgrel=4
 pkgdesc='Open source H.265/HEVC video encoder (git version)'
 arch=('x86_64')
 url='https://bitbucket.org/multicoreware/x265_git'
 license=('GPL')
-depends=('gcc-libs' 'numactl')
+depends=('libgcc' 'libstdc++' 'numactl')
 makedepends=('git' 'cmake' 'ninja' 'nasm')
 provides=('x265' 'libx265.so')
 # conflicts=('x265')
@@ -22,8 +22,8 @@ pkgver() {
 prepare() {
     # Un-break builds
     sed -i '/#include <limits>/a #include <cstdint>' x265_git/source/dynamicHDR10/json11/json11.cpp
-    # TODO: revisit this, as x265-git is now v4.1, and arch might be updating that (`X265_BUILD 215`) in a week
-    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 215)' x265_git/source/CMakeLists.txt
+    # TODO: revisit this, as x265-git is now v4.2, and arch might be updating that (`X265_BUILD 216`) in a week
+    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 216)' x265_git/source/CMakeLists.txt
     case "${TARGETPLATFORM}" in
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;

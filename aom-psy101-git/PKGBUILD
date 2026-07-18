@@ -2,15 +2,15 @@
 
 _pkgname=aom-psy101
 pkgname=$_pkgname-git
-pkgver=3.13.1.r185.6a3435223b
-pkgrel=2
+pkgver=3.14.1.r174.74890d72b1
+pkgrel=3
 pkgdesc='Another aom psy fork'
 arch=(x86_64)
 url=https://gitlab.com/damian101/aom-psy101
 license=(BSD-2-Clause custom:PATENTS)
 depends=(
-    gcc-libs
-    glibc
+    'libgcc' 'libstdc++'
+    'glibc'
 )
 makedepends=(
     git

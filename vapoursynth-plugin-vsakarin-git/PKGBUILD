@@ -10,7 +10,7 @@ url='https://github.com/akarinVS/vapoursynth-plugin.git'
 license=('GPL')
 depends=(
     'vapoursynth'
-    'gcc-libs' # libgcc_s.so libstdc++.so
+    'libgcc' 'libstdc++' # libgcc_s.so libstdc++.so
     'glibc' # ld-linux-x86-64.so libc.so libm.so
     'llvm-libs' # libLLVM.so
 )

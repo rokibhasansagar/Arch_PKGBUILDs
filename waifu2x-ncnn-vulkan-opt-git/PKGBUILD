@@ -10,7 +10,7 @@ url="https://github.com/nihui/waifu2x-ncnn-vulkan"
 license=('MIT')
 
 depends=(
-    'gcc-libs'
+    'libgcc' 'libstdc++'
     'libwebp'
     'ncnn'
     'vulkan-icd-loader'

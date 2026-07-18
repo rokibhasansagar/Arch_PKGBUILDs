@@ -10,7 +10,7 @@ arch=('x86_64')
 license=('MIT')
 
 depends=(
-    'gcc-libs'
+    'libgcc' 'libstdc++'
     'ncnn'
     'libjpeg-turbo'
     # 'zlib-ng-compat'  conflicts with zlib

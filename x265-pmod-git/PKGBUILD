@@ -1,13 +1,13 @@
 #!/hint/bash
 
 pkgname=x265-pmod-git
-pkgver=3.6+13+1.r0.g726aec12
-pkgrel=2
+pkgver=4.2+36+62.r4.gcb5d1a257
+pkgrel=3
 pkgdesc='Open source H.265/HEVC video encoder (git version)'
 arch=('x86_64')
 url='https://bitbucket.org/multicoreware/x265_git'
 license=('GPL')
-depends=('gcc-libs' 'numactl')
+depends=('libgcc' 'libstdc++' 'numactl')
 makedepends=('git' 'cmake' 'nasm' 'avisynthplus' 'vapoursynth')
 provides=('x265' 'libx265.so')
 # source=('git+https://github.com/rokibhasansagar/x265_mirror.git#branch=pMod-master')
@@ -20,7 +20,7 @@ pkgver() {
 }
 
 prepare() {
-    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 209)' x265_mirror/source/CMakeLists.txt
+    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 216)' x265_mirror/source/CMakeLists.txt
     case "${TARGETPLATFORM}" in
         "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
         "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
