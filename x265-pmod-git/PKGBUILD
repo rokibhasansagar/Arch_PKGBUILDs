@@ -29,7 +29,7 @@ prepare() {
 }
 
 build() {
-    export SuppressorFlags='-Wno-dev -Wno-unused-parameter -Wno-unused-variable -Wno-implicit-function-declaration -Wno-unused-result'
+    export SuppressorFlags='-Wno-author -Wno-unused-variable -Wno-implicit-function-declaration -Wno-unused-result'
     export CFLAGS_TUNING="-march=${targetmarch:-native} -O3"
     cmake -S x265_mirror/source -B build-12 \
         -G 'Unix Makefiles' \

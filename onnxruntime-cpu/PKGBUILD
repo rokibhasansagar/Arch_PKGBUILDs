@@ -80,8 +80,7 @@ build() {
     --compile-no-warning-as-error
     -S cmake
     -B build
-    -Wno-dev
-    -Wno-unused-parameter
+    -Wno-author
     -G Ninja
     -DCMAKE_POLICY_VERSION_MINIMUM=3.5
     -DCMAKE_BUILD_TYPE=None

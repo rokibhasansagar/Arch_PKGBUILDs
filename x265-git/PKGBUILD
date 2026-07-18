@@ -33,7 +33,7 @@ prepare() {
 
 build() {
     local SuppressorFlags=(
-        -Wno-dev -Wno-unused-parameter -Wno-unused-variable
+        -Wno-author -Wno-unused-variable
         -Wno-implicit-function-declaration -Wno-unused-result
     )
     local common_options=(
