@@ -29,7 +29,6 @@ prepare() {
 }
 
 build() {
-    export SuppressorFlags='-Wno-author -Wno-unused-variable -Wno-implicit-function-declaration -Wno-unused-result'
     export CFLAGS_TUNING="-march=${targetmarch:-native} -O3"
     cmake -S x265_mirror/source -B build-12 \
         -G 'Unix Makefiles' \
@@ -42,7 +41,7 @@ build() {
         -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
-        ${SuppressorFlags}
+        -Wno-author
     cmake --build build-12
 
     cmake -S x265_mirror/source -B build-10 \
@@ -55,7 +54,7 @@ build() {
         -DCMAKE_C_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_CXX_FLAGS="$CFLAGS_TUNING" \
         -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
-        ${SuppressorFlags}
+        -Wno-author
     cmake --build build-10
 
     cmake -S x265_mirror/source -B build \
@@ -73,7 +72,7 @@ build() {
         -DENABLE_VAPOURSYNTH='ON' \
         -DENABLE_AVISYNTH='ON' \
         -DCMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy' \
-        ${SuppressorFlags}
+        -Wno-author
     ln -s ../build-10/libx265.a build/libx265_main10.a
     ln -s ../build-12/libx265.a build/libx265_main12.a
     cmake --build build

@@ -55,7 +55,6 @@ build() {
     export LDFLAGS+=' -fuse-ld=lld'
     CFLAGS=${CFLAGS/_FORTIFY_SOURCE=3/_FORTIFY_SOURCE=0}
     CXXFLAGS=${CXXFLAGS/_FORTIFY_SOURCE=3/_FORTIFY_SOURCE=0}
-    export SuppressorFlags='-Wno-dev -Wno-unused-parameter -Wno-unused-variable -Wno-implicit-function-declaration -Wno-unused-result'
     cmake -S $_pkgname -B build \
         -G Ninja \
         -DENABLE_TESTS=OFF \
@@ -71,7 +70,7 @@ build() {
         -DCMAKE_CXX_FLAGS="-flto -O3 -march=${targetmarch:-native}" \
         -DCMAKE_C_FLAGS="-flto -O3 -march=${targetmarch:-native} -pipe -fno-plt" \
         -DCMAKE_EXE_LINKER_FLAGS="-flto -O3 -march=${targetmarch:-native}" \
-        ${SuppressorFlags}
+        -Wno-author
     cmake --build build
 }
 

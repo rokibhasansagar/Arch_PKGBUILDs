@@ -1,7 +1,7 @@
 #!/hint/bash
 
 pkgname=x265-git
-pkgver=4.2.r40.g6fdfffe8d
+pkgver=4.2.r59.gb81f650e2
 pkgrel=4
 pkgdesc='Open source H.265/HEVC video encoder (git version)'
 arch=('x86_64')
@@ -32,10 +32,6 @@ prepare() {
 }
 
 build() {
-    local SuppressorFlags=(
-        -Wno-author -Wno-unused-variable
-        -Wno-implicit-function-declaration -Wno-unused-result
-    )
     local common_options=(
         -S x265_git/source
         -G Ninja
@@ -44,7 +40,7 @@ build() {
         -D CMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy'
         -D CMAKE_C_FLAGS="-march=${targetmarch:-native} -O3"
         -D CMAKE_CXX_FLAGS="-march=${targetmarch:-native} -O3"
-        "${SuppressorFlags[@]}"
+        -Wno-author
     ) hdr_options=(
         "${common_options[@]}"
         -D ENABLE_CLI=FALSE
