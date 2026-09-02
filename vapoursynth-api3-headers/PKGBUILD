@@ -1,0 +1,35 @@
+#!/hint/bash
+# Maintainer: Rokib Hasan Sagar <rokibhasansagar2014@outlook.com>
+
+pkgname=vapoursynth-api3-headers
+pkgver=2
+pkgrel=1
+pkgdesc="Headers from VapourSynth R72 for building API3 plugins"
+arch=('any')
+url="https://github.com/vapoursynth/vapoursynth"
+license=('LGPL-2.1-only')
+depends=('vapoursynth>=74')
+makedepends=('python')
+conflicts=('vapoursynth<=73')
+
+_baseurl="https://raw.githubusercontent.com/vapoursynth/vapoursynth/R72/include"
+
+source=(
+    "${_baseurl}/VapourSynth.h"
+    "${_baseurl}/VSHelper.h"
+    "${_baseurl}/VSScript.h"
+)
+
+sha256sums=(
+    'SKIP'
+    'SKIP'
+    'SKIP'
+)
+
+package() {
+    _include="$(python -c "import vapoursynth, os; print(os.path.dirname(vapoursynth.__file__))")/include"
+
+    for _header in VapourSynth.h VSHelper.h VSScript.h; do
+        install -Dm644 "${srcdir}/${_header}" "${pkgdir}${_include}/${_header}"
+    done
+}
