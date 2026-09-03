@@ -1,9 +1,9 @@
 # Contributor: Levente Polyak <anthraxx[at]archlinux[dot]org>
 # Contributor: MGislv <mgislv at ceppo dot xyz>
+# Maintainer: Rokib Hasan Sagar <rokibhasansagar[at]outlook[dot]com>
 
 pkgname=zlib
 epoch=1
-# pkgver=2.3.1.r497.ggee63972c
 pkgver=1.3.2
 pkgrel=3.1
 pkgdesc='zlib replacement with optimizations for next generation systems'
@@ -11,14 +11,9 @@ url='https://github.com/zlib-ng/zlib-ng'
 arch=('x86_64')
 license=('Zlib')
 depends=('glibc')
-makedepends=('git' 'cmake' 'ninja')
+makedepends=('git' 'gcc' 'cmake' 'ninja')
 source=("git+$url.git")
 sha256sums=('SKIP')
-
-# pkgver() {
-#     cd zlib-ng
-#     git describe --long --tags | sed 's/-/.r/;s/-/.g/'
-# }
 
 build() {
     cmake -B build -S zlib-ng \
