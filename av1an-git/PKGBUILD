@@ -31,18 +31,18 @@ pkgver() {
 
 prepare() {
     cd "Av1an"
-    case "${TARGETPLATFORM}" in
-        "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
-        "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
-        *) export targetmarch="native" ;;
-    esac
-    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo fetch --target "${arch}-unknown-linux-gnu"
+    export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=clang
+    cargo fetch --target "${arch}-unknown-linux-gnu"
 }
 
 build() {
     cd "Av1an"
-    local CFLAGS+=" -ffat-lto-objects"
-    RUSTUP_TOOLCHAIN=stable RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" \
+    # Force the build environment to use LLVM/Clang
+    export CC=clang CXX=clang++
+    export CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER=clang
+    export CFLAGS+=" -flto=thin" CXXFLAGS+=" -flto=thin"
+    # local CFLAGS+=" -ffat-lto-objects"
+    RUSTUP_TOOLCHAIN=stable \
         cargo build --target "${arch}-unknown-linux-gnu" --release
 
     strip "target/${arch}-unknown-linux-gnu/release/av1an"

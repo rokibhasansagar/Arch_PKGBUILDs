@@ -9,7 +9,7 @@ arch=('x86_64')
 url='https://github.com/quietvoid/dovi_tool/tree/main/dolby_vision'
 license=('MIT')
 depends=('libgcc' 'libstdc++' 'glibc')
-makedepends=('git' 'cargo' 'cargo-c')
+makedepends=('git' 'rust' 'cargo-c')
 # conflicts=('libdovi')
 provides=('libdovi' 'libdovi.so')
 source=("git+https://github.com/quietvoid/dovi_tool.git")
@@ -21,23 +21,18 @@ pkgver() {
 }
 
 prepare() {
-    case "${TARGETPLATFORM}" in
-        "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
-        "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
-        *) export targetmarch="native" ;;
-    esac
-    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo fetch \
+    cargo fetch \
         --manifest-path dovi_tool/dolby_vision/Cargo.toml
 }
 
 build() {
-    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo cbuild \
+    cargo cbuild \
         --release --frozen --prefix=/usr \
         --manifest-path dovi_tool/dolby_vision/Cargo.toml
 }
 
 check() {
-    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo test \
+    cargo test \
         --release --frozen --all-features \
         --manifest-path dovi_tool/dolby_vision/Cargo.toml
 }
@@ -45,7 +40,7 @@ check() {
 package() {
     cd dovi_tool/dolby_vision
 
-    RUSTFLAGS="$RUSTFLAGS -C target-cpu=${targetmarch:-native}" cargo cinstall \
+    cargo cinstall \
         --release --frozen --prefix /usr \
         --destdir "${pkgdir}"
 
