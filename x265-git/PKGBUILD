@@ -11,7 +11,7 @@ depends=('libgcc' 'libstdc++' 'numactl')
 makedepends=('git' 'cmake' 'ninja' 'nasm')
 provides=('x265' 'libx265.so')
 replaces=('x265')
-source=('git+https://github.com/multicoreware/x265.git')
+source=('git+https://github.com/Multicorewareinc/x265.git')
 sha256sums=('SKIP')
 options=('!debug')
 
