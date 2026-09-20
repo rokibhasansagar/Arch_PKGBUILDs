@@ -1,8 +1,8 @@
 #!/hint/bash
 
-pkgname=x265-git
-pkgver=4.2.r59.gb81f650e2
-pkgrel=4
+pkgname=x265
+pkgver=4.3
+pkgrel=4.1
 pkgdesc='Open source H.265/HEVC video encoder (git version)'
 arch=('x86_64')
 url='https://bitbucket.org/multicoreware/x265_git'
@@ -10,36 +10,29 @@ license=('GPL')
 depends=('libgcc' 'libstdc++' 'numactl')
 makedepends=('git' 'cmake' 'ninja' 'nasm')
 provides=('x265' 'libx265.so')
-# conflicts=('x265')
-source=('git+https://bitbucket.org/multicoreware/x265_git.git')
+replaces=('x265')
+source=('git+https://github.com/multicoreware/x265.git')
 sha256sums=('SKIP')
 options=('!debug')
 
-pkgver() {
-    git -C x265_git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
-}
+# pkgver() {
+#     git -C x265 describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g;s/^v//'
+# }
 
 prepare() {
     # Un-break builds
-    sed -i '/#include <limits>/a #include <cstdint>' x265_git/source/dynamicHDR10/json11/json11.cpp
-    # TODO: revisit this, as x265-git is now v4.2, and arch might be updating that (`X265_BUILD 216`) in a week
-    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 216)' x265_git/source/CMakeLists.txt
-    case "${TARGETPLATFORM}" in
-        "linux/amd64/v2") export targetmarch="x86-64-v2" ;;
-        "linux/amd64/v3") export targetmarch="x86-64-v3" ;;
-        *) export targetmarch="native" ;;
-    esac
+    # sed -i '/#include <limits>/a #include <cstdint>' x265_git/source/dynamicHDR10/json11/json11.cpp
+    # TODO: revisit this, as x265-git is now v4.3, and arch might be updating that (`X265_BUILD 217`) in a week
+    sed -i '/set(X265_BUILD 2[0-9][0-9])/cset(X265_BUILD 217)' x265/source/CMakeLists.txt
 }
 
 build() {
     local common_options=(
-        -S x265_git/source
+        -S x265/source
         -G Ninja
         -D CMAKE_INSTALL_PREFIX=/usr
         -D ENABLE_HDR10_PLUS=TRUE
         -D CMAKE_ASM_NASM_FLAGS='-w-macro-params-legacy'
-        -D CMAKE_C_FLAGS="-march=${targetmarch:-native} -O3"
-        -D CMAKE_CXX_FLAGS="-march=${targetmarch:-native} -O3"
         -Wno-author
     ) hdr_options=(
         "${common_options[@]}"
